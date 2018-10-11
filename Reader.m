@@ -13,15 +13,17 @@ classdef Reader
             obj.dataAccessor = DataAccessor;
         end
         
-        function DICOM_files = ReadDicomFiles(paths)
+        function DICOM_files = ReadDicomFiles(obj,paths)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             
-            DICOM_files = zeros(lenght(paths));
+            %Præallokering for effektivitet
+            DICOM_files = repmat(DICOM_File_DTO(),1,length(paths));
+            
             for i = 1: length(paths)
                 d = DICOM_File_DTO;
-                d.pixelData = dicomread(paths(i));
-                d.dicomInfo = dicominfo(paths(i));
+                d.pixelData = obj.dataAccessor.Dicomread(paths{i});
+                d.dicomInfo = obj.dataAccessor.Dicominfo(paths{i});
                 DICOM_files(i) = d;
             end
         end
