@@ -19,10 +19,12 @@ classdef ContrastAdjuster
             outputFrame = frame.^gamma;
         end
         
+        
+        % Overveje 
         function outputFrame = HistogramEqualize(obj,frame)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            outputFrame = histeq(frame); 
+            outputFrame = histeq(frame,levels); 
         end
         
     end
