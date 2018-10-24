@@ -23,7 +23,7 @@ classdef ContrastAdjuster
         function outputFrame = HistogramEqualize(obj,frame)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            outputFrame = histeq(frame,levels); 
+            outputFrame = histeq(frame); 
         end
         
     end

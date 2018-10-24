@@ -8,10 +8,10 @@ classdef DicomDisplay
     end
     
     methods
-        function obj = untitled(inputArg1,inputArg2)
+        function obj = Constructor(obj)
             %UNTITLED Construct an instance of this class
             %   Detailed explanation goes here
-            obj.Property1 = inputArg1 + inputArg2;
+            obj.reader = Reader;
         end
         
         function outputArg = method1(obj,inputArg)
@@ -24,8 +24,6 @@ classdef DicomDisplay
             
             
         end
-        
-        
     end
 end
 
