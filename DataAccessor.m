@@ -16,13 +16,13 @@ classdef DataAccessor
         function outputFrame = Dicomread(obj,path)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            outputFrame = dicomread(path);
+            outputFrame = dicomread(fullfile(path.folder, path.name));
         end
         
         function outputDicomInfo = Dicominfo(obj,path)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            outputDicomInfo = dicominfo(path);
+            outputDicomInfo = dicominfo(fullfile(path.folder, path.name));
         end
         
     end
