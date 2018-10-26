@@ -42,13 +42,17 @@ classdef Reader
             
             imCounter = 1;
             locAndCalCounter = 1;
-            for i=3: length(DICOMFiles)
+            
+            %Måske vi kan finde en anden metode end i=3 til at komme af med
+            %punktum-mapperne.
+            for i=1: length(DICOMFiles)
                 if(contains(lower(information{i}.SeriesDescription), '2d ge epi ss 1')==0) 
                     LocAndCal{locAndCalCounter} = information{i};
                     locAndCalCounter = locAndCalCounter+1;
                 else
                     ims{imCounter} = information{i};
-                    frame{imCounter} = DICOMFiles{i};
+                    frame{imCounter} = DICOMFiles{i}.pixelData;
+                    dto{imCounter} = DICOMFiles{i};
                     imCounter = imCounter +1;
                 end
             end
@@ -72,24 +76,44 @@ classdef Reader
                     index = length(slices)+1;
                     slices{index}.images{1} = ims{i};
                     slices{index}.pixels{1} = frame{i};
+                    slicesDto{index}.DTO{1} = dto{i};
                 else
                     if(exist('slices','var'))
                         if(isfield(slices{c}, 'images'))
                             slices{c}.images{length(slices{c}.images)+1}= ims{i};
                             slices{c}.pixels{length(slices{c}.pixels)+1}= frame{i};
+                            slicesDto{c}.DTO{length(slicesDto{c}.DTO)+1} = dto{i};
                         else
                             slices{c}.images{1}= ims{i};
                             slices{c}.pixels{1}= frame{i};
+                            slicesDto{c}.DTO{1} = dto{i};
                         end
                     else
                         slices{1}.images{1}= ims{i}; 
                         slices{1}.pixels{1}= frame{i}; 
+                        slicesDto{1}.DTO{1} = dto{i};
                     end
                 end
             end
             
             [sortedSlice, idx] = sort(sliceLocs);
-            SortedDicomFiles = slices(idx);
+            %SortedDicomFiles = slices(idx);
+            SortedDicomFiles = slicesDto(idx);
+            SortedDicomFiles = obj.SortSlices(SortedDicomFiles);
+        end
+        
+        function SortedSlices = SortSlices(obj,SortedDicomFrames)
+            for i=1: length(SortedDicomFrames)
+                %Nedenfor stod der images før hvor der nu står DTO
+                for j=1:length(SortedDicomFrames{i}.DTO)
+                   % tempNumbers(j) = SortedDicomFrames{i}.images{j}.TemporalPositionIdentifier;
+                    tempNumbers(j) = SortedDicomFrames{i}.DTO{j}.dicomInfo.TemporalPositionIdentifier;
+                end
+                [~,idx] = sort(tempNumbers);
+              %  SortedDicomFrames{i}.images = SortedDicomFrames{i}.images(idx);
+                SortedDicomFrames{i}.DTO = SortedDicomFrames{i}.DTO(idx);
+            end
+            SortedSlices = SortedDicomFrames;
         end
     end
 end
