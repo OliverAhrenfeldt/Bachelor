@@ -1,4 +1,4 @@
-classdef Reader
+classdef Reader < handle
     %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -24,44 +24,73 @@ classdef Reader
                 d = DICOM_File_DTO;
                 d.pixelData = obj.dataAccessor.Dicomread(paths(i));
                 d.dicomInfo = obj.dataAccessor.Dicominfo(paths(i));
-                DICOM_files(i) = d;
-                DICOM_filess{i} = d;
+               % DICOM_files(i) = d;
+                DICOM_files{i} = d;
                 waitbar(i/length(paths),wbar);
             end
             
-            DICOM_files_Sorted = obj.SortDicomFiles(DICOM_filess);
-            figure()
+            DICOM_files_Sorted = obj.SortDicomFiles(DICOM_files);
         end
         
         function SortedDicomFiles = SortDicomFiles(obj,DICOMFiles)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            for p=1:length(DICOMFiles)
-                information{p}=DICOMFiles{p}.dicomInfo;
-            end
+                
+              locCounter = 1;
+              
+              for i=1:length(DICOMFiles)
+                  currentDesc = DICOMFiles{i}.dicomInfo.SeriesDescription;
+                  
+                  if(contains(lower(currentDesc),'loc'))
+                     localizers{locCounter} = DICOMFiles{i};
+                     locCounter = locCounter + 1;
+                     
+                  else
+                      if(exist('descriptions','var'))
+                        index = 0;
+                        for j = 1: length(descriptions)
+                            if(strcmp(currentDesc,descriptions{j}.description{1}))
+                                index = j;
+                            end
+                        end
+                        
+                            if(index ~= 0)
+                               descriptions{index}.description{length(descriptions{index}.description)+1} = currentDesc;
+                               descriptions{index}.idx(length(descriptions{index}.idx)+1) = i;
+                            else
+                               index = length(descriptions) + 1;
+                               descriptions{index}.description{1} = currentDesc;
+                               descriptions{index}.idx(1) = i;
+                            end
+                          
+                      else
+                          descriptions{1}.idx(1) = i;
+                          descriptions{1}.description{1} = currentDesc;
+                      end
+                  end
+        
+              end
+              
+              index = 1;
+              for k = 2: length(descriptions)
+                  if(length(descriptions{k}.idx)>length(descriptions{index}.idx))
+                      index = k;
+                  end
+              end
+              
+              bold = DICOMFiles(descriptions{index}.idx);
+              SortedDicomFiles = obj.SortSlices(bold);
+              figure();
+              
+        end
+        
+        function SortedSlices = SortSlices(obj,SortedDicomFiles)
             
-            imCounter = 1;
-            locAndCalCounter = 1;
-            
-            %Måske vi kan finde en anden metode end i=3 til at komme af med
-            %punktum-mapperne.
-            for i=1: length(DICOMFiles)
-                if(contains(lower(information{i}.SeriesDescription), '2d ge epi ss 1')==0) 
-                    LocAndCal{locAndCalCounter} = information{i};
-                    locAndCalCounter = locAndCalCounter+1;
-                else
-                    ims{imCounter} = information{i};
-                    frame{imCounter} = DICOMFiles{i}.pixelData;
-                    dto{imCounter} = DICOMFiles{i};
-                    imCounter = imCounter +1;
-                end
-            end
-
             c = 0;
-            sliceLocs(1) = ims{1}.SliceLocation;
+            sliceLocs(1) = SortedDicomFiles{1}.dicomInfo.SliceLocation;
 
-            for i=1: length(ims)
-                curSliceLoc = ims{i}.SliceLocation;
+            for i=1: length(SortedDicomFiles)
+                curSliceLoc = SortedDicomFiles{i}.dicomInfo.SliceLocation;
 
                 boolean = 0;
                 for ii=1: length(sliceLocs)
@@ -73,47 +102,38 @@ classdef Reader
 
                 if(boolean == 0)
                     sliceLocs(length(sliceLocs)+1) = curSliceLoc;
-                    index = length(slices)+1;
-                    slices{index}.images{1} = ims{i};
-                    slices{index}.pixels{1} = frame{i};
-                    slicesDto{index}.DTO{1} = dto{i};
+                    
+                    index = length(slicesDto)+1;
+                    slicesDto{index}.DTO{1} = SortedDicomFiles{i};
                 else
-                    if(exist('slices','var'))
-                        if(isfield(slices{c}, 'images'))
-                            slices{c}.images{length(slices{c}.images)+1}= ims{i};
-                            slices{c}.pixels{length(slices{c}.pixels)+1}= frame{i};
-                            slicesDto{c}.DTO{length(slicesDto{c}.DTO)+1} = dto{i};
+                    if(exist('slicesDto','var'))
+                        if(isfield(slicesDto{c}, 'DTO'))
+                            slicesDto{c}.DTO{length(slicesDto{c}.DTO)+1} = SortedDicomFiles{i};
                         else
-                            slices{c}.images{1}= ims{i};
-                            slices{c}.pixels{1}= frame{i};
-                            slicesDto{c}.DTO{1} = dto{i};
+                            slicesDto{c}.DTO{1} = SortedDicomFiles{i};
                         end
                     else
-                        slices{1}.images{1}= ims{i}; 
-                        slices{1}.pixels{1}= frame{i}; 
-                        slicesDto{1}.DTO{1} = dto{i};
+                        slicesDto{1}.DTO{1} = SortedDicomFiles{i};
                     end
                 end
             end
             
             [sortedSlice, idx] = sort(sliceLocs);
-            %SortedDicomFiles = slices(idx);
             SortedDicomFiles = slicesDto(idx);
-            SortedDicomFiles = obj.SortSlices(SortedDicomFiles);
+            SortedSlices = obj.SortFrames(SortedDicomFiles);
+            
         end
         
-        function SortedSlices = SortSlices(obj,SortedDicomFrames)
+        function SortedFrames = SortFrames(obj,SortedDicomFrames)
             for i=1: length(SortedDicomFrames)
-                %Nedenfor stod der images før hvor der nu står DTO
+
                 for j=1:length(SortedDicomFrames{i}.DTO)
-                   % tempNumbers(j) = SortedDicomFrames{i}.images{j}.TemporalPositionIdentifier;
                     tempNumbers(j) = SortedDicomFrames{i}.DTO{j}.dicomInfo.TemporalPositionIdentifier;
                 end
                 [~,idx] = sort(tempNumbers);
-              %  SortedDicomFrames{i}.images = SortedDicomFrames{i}.images(idx);
                 SortedDicomFrames{i}.DTO = SortedDicomFrames{i}.DTO(idx);
             end
-            SortedSlices = SortedDicomFrames;
+            SortedFrames = SortedDicomFrames;
         end
     end
 end
