@@ -18,13 +18,11 @@ classdef Reader < handle
             %   Detailed explanation goes here
             
             %Præallokering for effektivitet
-            DICOM_files = repmat(DICOM_File_DTO(),1,length(paths));
             wbar = waitbar(0, 'Reading images');
             for i = 1: length(paths)
                 d = DICOM_File_DTO;
                 d.pixelData = obj.dataAccessor.Dicomread(paths(i));
                 d.dicomInfo = obj.dataAccessor.Dicominfo(paths(i));
-               % DICOM_files(i) = d;
                 DICOM_files{i} = d;
                 waitbar(i/length(paths),wbar);
             end
