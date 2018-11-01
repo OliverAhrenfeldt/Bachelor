@@ -68,8 +68,8 @@ classdef Reader < handle
                   end        
               end
               
-              index = 1;
               if(length(descriptions) > 1)
+                  index = 1;
                  for k = 2: length(descriptions)
                       if(length(descriptions{k}.idx)>length(descriptions{index}.idx))
                          index = k;
