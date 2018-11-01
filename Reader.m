@@ -65,21 +65,19 @@ classdef Reader < handle
                           descriptions{1}.idx(1) = i;
                           descriptions{1}.description{1} = currentDesc;
                       end
-                  end
-        
+                  end        
               end
               
               index = 1;
-              for k = 2: length(descriptions)
-                  if(length(descriptions{k}.idx)>length(descriptions{index}.idx))
-                      index = k;
-                  end
-              end
-              
+              if(length(descriptions) > 1)
+                 for k = 2: length(descriptions)
+                      if(length(descriptions{k}.idx)>length(descriptions{index}.idx))
+                         index = k;
+                      end
+                end
+              end              
               bold = DICOMFiles(descriptions{index}.idx);
-              SortedDicomFiles = obj.SortSlices(bold);
-              figure();
-              
+              SortedDicomFiles = obj.SortSlices(bold);              
         end
         
         function SortedSlices = SortSlices(obj,SortedDicomFiles)
@@ -124,7 +122,9 @@ classdef Reader < handle
         
         function SortedFrames = SortFrames(obj,SortedDicomFrames)
             for i=1: length(SortedDicomFrames)
-
+                % tempNumbers nulstilles da der i testscenariet ikke
+                % nødvendigvis er samme antal billeder i hvert slice.
+                tempNumbers = [];
                 for j=1:length(SortedDicomFrames{i}.DTO)
                     tempNumbers(j) = SortedDicomFrames{i}.DTO{j}.dicomInfo.TemporalPositionIdentifier;
                 end
