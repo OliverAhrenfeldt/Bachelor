@@ -4,6 +4,7 @@ classdef DicomDisplay
     
     properties
         dicom_files;
+        dicomLocalizers;
         reader;
     end
     
@@ -41,7 +42,7 @@ classdef DicomDisplay
                 paths{Counter} = pathsWithDotFolders(i); 
                 Counter = Counter+1; 
             end
-            obj.dicom_files = obj.reader.ReadDicomFiles(paths);
+            [obj.dicom_files, obj.dicomLocalizers] = obj.reader.ReadDicomFiles(paths);
             dicomFile = obj.dicom_files{1}.DTO{1};
             dicomFile = obj.NormalizeFrame(dicomFile);
 
