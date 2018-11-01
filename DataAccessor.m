@@ -24,7 +24,5 @@ classdef DataAccessor
             %   Detailed explanation goes here
             outputDicomInfo = dicominfo(fullfile(path{1}.folder, path{1}.name));
         end
-        
     end
 end
-

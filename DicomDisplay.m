@@ -20,6 +20,10 @@ classdef DicomDisplay
             %   Detailed explanation goes here
             dicomFile = obj.dicom_files{sliceCounter}.DTO{frameCounter};
             dicomFile = obj.NormalizeFrame(dicomFile);
+            
+            %Konverterer dicomInfo fra et struct til en tabel, så vi kan
+            %vise infoen på GUI'en
+            dicomFile.dicomInfo = obj.CreateTable(dicomFile.dicomInfo);
         end
         
         function [dicomFile, object, numberOfFrames, numberOfSlices] = ReadDicomFiles(obj, path)
@@ -40,6 +44,11 @@ classdef DicomDisplay
             obj.dicom_files = obj.reader.ReadDicomFiles(paths);
             dicomFile = obj.dicom_files{1}.DTO{1};
             dicomFile = obj.NormalizeFrame(dicomFile);
+
+            %Konverterer dicomInfo fra et struct til en tabel, så vi kan
+            %vise infoen på GUI'en
+            dicomFile.dicomInfo = obj.CreateTable(dicomFile.dicomInfo);
+            
             object = obj;
             
             numberOfFrames = length(obj.dicom_files{1}.DTO);
@@ -47,9 +56,20 @@ classdef DicomDisplay
         end
         
         function NormalizedDicom = NormalizeFrame(obj,DicomDTOFile)
+            %METHOD1 Summary of this method goes here
+            %   Detailed explanation goes here
             DicomDTOFile.pixelData= double(DicomDTOFile.pixelData);
             DicomDTOFile.pixelData = DicomDTOFile.pixelData/max(DicomDTOFile.pixelData(:));
             NormalizedDicom = DicomDTOFile;
+        end
+        
+        function dicomTable = CreateTable(obj,dicomInfo)
+            %METHOD1 Summary of this method goes here
+            %   Detailed explanation goes here
+            
+            cola = fieldnames(dicomInfo);
+            colb = struct2cell(dicomInfo);
+            dicomTable = table(cola,colb); 
         end
     end
 end
