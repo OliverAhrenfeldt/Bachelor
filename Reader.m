@@ -13,7 +13,7 @@ classdef Reader < handle
             obj.dataAccessor = DataAccessor;
         end
         
-        function DICOM_files_Sorted = ReadDicomFiles(obj,paths)
+        function [DICOM_files_Sorted, dicomLocalizers] = ReadDicomFiles(obj,paths)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             
@@ -27,10 +27,10 @@ classdef Reader < handle
                 waitbar(i/length(paths),wbar);
             end
             
-            DICOM_files_Sorted = obj.SortDicomFiles(DICOM_files);
+            [DICOM_files_Sorted,dicomLocalizers] = obj.SortDicomFiles(DICOM_files);
         end
         
-        function SortedDicomFiles = SortDicomFiles(obj,DICOMFiles)
+        function [SortedDicomFiles, localizers] = SortDicomFiles(obj,DICOMFiles)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
                 
