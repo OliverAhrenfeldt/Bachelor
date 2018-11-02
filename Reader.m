@@ -125,18 +125,18 @@ classdef Reader < handle
             
         end
         
-        function SortedFrames = SortFrames(obj,SortedDicomFrames)
-            for i=1: length(SortedDicomFrames)
+        function SortedFrames = SortFrames(obj,FramesToSort)
+            for i=1: length(FramesToSort)
                 % tempNumbers nulstilles da der i testscenariet ikke
                 % nødvendigvis er samme antal billeder i hvert slice.
                 tempNumbers = [];
-                for j=1:length(SortedDicomFrames{i}.DTO)
-                    tempNumbers(j) = SortedDicomFrames{i}.DTO{j}.dicomInfo.TemporalPositionIdentifier;
+                for j=1:length(FramesToSort{i}.DTO)
+                    tempNumbers(j) = FramesToSort{i}.DTO{j}.dicomInfo.TemporalPositionIdentifier;
                 end
                 [~,idx] = sort(tempNumbers);
-                SortedDicomFrames{i}.DTO = SortedDicomFrames{i}.DTO(idx);
+                FramesToSort{i}.DTO = FramesToSort{i}.DTO(idx);
             end
-            SortedFrames = SortedDicomFrames;
+            SortedFrames = FramesToSort;
         end
     end
 end
