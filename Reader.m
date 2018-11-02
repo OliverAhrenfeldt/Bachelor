@@ -68,6 +68,11 @@ classdef Reader < handle
                   end        
               end
               
+              if(~exist('descriptions','var'))
+                SortedDicomFiles = [];
+                return; 
+              end
+              
               if(length(descriptions) > 1)
                   index = 1;
                  for k = 2: length(descriptions)
