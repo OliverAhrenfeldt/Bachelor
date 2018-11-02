@@ -84,7 +84,7 @@ classdef Reader < handle
               bold = DICOMFiles(descriptions{index}.idx);
               
               if(~exist('localizers','var'))
-                  localizers = cell(1,1);
+                  localizers = [];
               end
               
               SortedDicomFiles = obj.SortSlices(bold);              
