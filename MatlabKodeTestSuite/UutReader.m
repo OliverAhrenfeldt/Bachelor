@@ -4,8 +4,8 @@ classdef UutReader < matlab.unittest.TestCase
     
     methods (Static)
        
-       function [ReaderObj DtoObjs] = StaticSetup() %Arrange
-           addpath ../MatlabKode
+       function [ReaderObj DicomFiles paths] = Setup() %Arrange
+           addpath ../
            
            DicomFilesPath = {
                '../TestData/Z5795_Bold'
@@ -22,6 +22,7 @@ classdef UutReader < matlab.unittest.TestCase
             end
             
             %Opretter Dicom filer med anderledes Series Description tag
+            %Temporal position identifier
             DicomFiles{5} = DicomFiles{1};
             DicomFiles{5}.dicomInfo.SeriesDescription = '2D GE EPI SS 1 T';
             DicomFiles{6} = DicomFiles{2};
@@ -29,10 +30,13 @@ classdef UutReader < matlab.unittest.TestCase
             DicomFiles{7} = DicomFiles{1};
             DicomFiles{7}.dicomInfo.TemporalPositionIdentifier = 2;
             
+            %Indlæser Dicomfilerne indeks 2,3 og 4 i DicomFilesPath
+            for i = 1: 3
+                paths{i} = dir(fullfile(DicomFilesPath{i+1}));
+            end
             
-            DtoObjs = DicomFiles;
             ReaderObj = Reader; 
-     
+            ReaderObj.dataAccessor = StubDataAccess;
        end       
     end
     
@@ -74,7 +78,8 @@ classdef UutReader < matlab.unittest.TestCase
             expSolution = 0;
             testCase.verifyEqual(actSolution,expSolution); %Assert
          end
-        
+              
+         
          function SortDicomFiles1_3(testCase)
             [uut dto] = UutReader.StaticSetup();
             
@@ -162,7 +167,30 @@ classdef UutReader < matlab.unittest.TestCase
          end
         
          
-          function SortDicomFiles1_8(testCase)
+         function SortDicomFiles1_8(testCase)
+            [uut dto] = UutReader.StaticSetup();
+            
+            %Filtrere unødvendige DICOM filer for testcasen
+            dtoTest(1,1) = dto(:,5);
+            dtoTest(1,2) = dto(:,6);
+            dtoTest(1,3) = dto(:,1);
+            dtoTest(1,4) = dto(:,2);
+            dtoTest(1,5) = dto(:,3);
+              
+            [Dicom_Sorted Dicom_Localizer] = uut.SortDicomFiles(dtoTest); %Act
+            
+            actSolution = length(Dicom_Sorted);
+            expSolution = 3;
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+            
+            actSolution = length(Dicom_Localizer);
+            expSolution = 0;
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+         end
+         
+         
+         
+          function SortSlices1_9(testCase)
             [uut dto] = UutReader.StaticSetup();
             
             %Filtrere unødvendige DICOM filer for testcasen
@@ -182,7 +210,7 @@ classdef UutReader < matlab.unittest.TestCase
             testCase.verifyEqual(actSolution,expSolution); %Assert
           end
           
-          function SortDicomFiles1_9(testCase)
+          function SortSlices1_10(testCase)
             [uut dto] = UutReader.StaticSetup();
             
             %Filtrere unødvendige DICOM filer for testcasen
@@ -203,7 +231,7 @@ classdef UutReader < matlab.unittest.TestCase
           end
           
         
-          function SortDicomFiles1_10(testCase)
+          function SortFrames1_11(testCase)
             [uut dto] = UutReader.StaticSetup();
             
             %Filtrere unødvendige DICOM filer for testcasen
@@ -223,7 +251,7 @@ classdef UutReader < matlab.unittest.TestCase
             testCase.verifyEqual(actSolution,expSolution); %Assert
           end
           
-          function SortDicomFiles1_11(testCase)
+          function SortFrames1_12(testCase)
             [uut dto] = UutReader.StaticSetup();
             
             %Filtrere unødvendige DICOM filer for testcasen
@@ -243,7 +271,24 @@ classdef UutReader < matlab.unittest.TestCase
             testCase.verifyEqual(actSolution,expSolution); %Assert
           end
         
-        
+        function ReadDicomFiles1_13(testCase)
+            [uut dto path] = UutReader.StaticSetup();
+            
+            
+            %SortDicomFiles funktionen kaldes, da den kalder SortSlices
+            %sidste linje
+            [Dicom_Sorted Dicom_Localizer] = uut.ReadDicomFiles(path); %Act
+                  
+            actSolution = length(Dicom_Sorted);
+            expSolution = 2;
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+            
+            actSolution = length(Dicom_Localizer);
+            expSolution = 1;
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+          end
+          
+          
     end
 end
 
