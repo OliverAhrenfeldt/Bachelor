@@ -25,7 +25,6 @@ classdef ContrastAdjuster
             %   Detailed explanation goes here
             outputFrame = histeq(frame); 
         end
-        
     end
 end
 
