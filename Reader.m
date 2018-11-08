@@ -7,6 +7,7 @@ classdef Reader < handle
     end
     
     methods
+        
         function obj = Constructor(obj)
             %UNTITLED Construct an instance of this class
             %   Detailed explanation goes here
@@ -25,7 +26,8 @@ classdef Reader < handle
                 d.dicomInfo = obj.dataAccessor.Dicominfo(paths(i));
                 DICOM_files{i} = d;
                 waitbar(i/length(paths),wbar);
-            end
+            end 
+            close(wbar);
             
             [DICOM_files_Sorted,dicomLocalizers] = obj.SortDicomFiles(DICOM_files);
         end
@@ -79,8 +81,9 @@ classdef Reader < handle
                       if(length(descriptions{k}.idx)>length(descriptions{index}.idx))
                          index = k;
                       end
-                end
-              end              
+                 end
+              end
+              
               bold = DICOMFiles(descriptions{index}.idx);
               
               if(~exist('localizers','var'))
@@ -115,8 +118,8 @@ classdef Reader < handle
                     if(exist('slicesDto','var'))
                         if(isfield(slicesDto{c}, 'DTO'))
                             slicesDto{c}.DTO{length(slicesDto{c}.DTO)+1} = SortedDicomFiles{i};
-                        else
-                            slicesDto{c}.DTO{1} = SortedDicomFiles{i};
+%                         else
+%                             slicesDto{c}.DTO{1} = SortedDicomFiles{i};
                         end
                     else
                         slicesDto{1}.DTO{1} = SortedDicomFiles{i};
