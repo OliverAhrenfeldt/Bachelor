@@ -27,28 +27,60 @@ classdef ROIController < handle
         
         function Names = getNames(obj)
             for i =1:length(obj.ROICollections)
-                Names{i} = obj.ROICollections{i}.Name; 
+                if (isempty(obj.ROICollections{i}) ~= 1)
+                    Names{i} = obj.ROICollections{i}.Name; 
+                end
             end
         end
         
         function AnalysisStatus = getAnalysisStatus(obj)
             for i =1:length(obj.ROICollections)
-                AnalysisStatus{i} = obj.ROICollections{i}.AnalysisStatus; 
+                if (isempty(obj.ROICollections{i}) ~= 1)
+                    AnalysisStatus{i} = obj.ROICollections{i}.AnalysisStatus; 
+                end
             end
         end
         
         function ROITable = getROITable(obj)
-            cola = obj.getNames()';
-            AnalysisStatus = obj.getAnalysisStatus()';
-            for i=1: length(AnalysisStatus)
-                if(AnalysisStatus{i}==0)
-                    colb{i} = false;
-                else
-                    colb{i} = true;
+            
+            if (isempty(obj.ROICollections) == 0)
+                cola = obj.getNames()';
+                AnalysisStatus = obj.getAnalysisStatus()';
+                for i=1: length(AnalysisStatus)
+                    if(AnalysisStatus{i}==0)
+                        colb{i} = false;
+                    else
+                        colb{i} = true;
+                    end
+                end
+                ROITable = table(cola,colb'); 
+            else
+                ROITable = {};
+            end
+        end
+        
+        function DeleteROI(obj, idx, framenumber, slicenumber)
+            for i=1:length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI)
+                delete(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{i});
+            end
+        end
+        
+        function DeleteROICollection(obj, idx, framenumber, slicenumber)
+            
+            for i=1:length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI)
+                delete(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{i});
+            end
+            
+            obj.ROICollections{idx} = [];
+            for i=idx+1:length(obj.ROICollections)
+                if (isempty(obj.ROICollections{i}) == 0)
+                    obj.ROICollections{i-1} = obj.ROICollections{i};
                 end
             end
-            ROITable = table(cola,colb'); 
+            
+            obj.ROICollections(length(obj.ROICollections)) = [];
         end
+        
     end
 end
 
