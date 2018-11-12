@@ -23,6 +23,7 @@ classdef ROIController < handle
         
         function AddROI(obj, idx, framenumber, slicenumber, polygon) 
             obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI)+1} = polygon;
+            obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.Position{length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.Position)+1} = polygon.Position;
         end
         
         function Names = getNames(obj)

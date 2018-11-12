@@ -17,6 +17,7 @@ classdef ROICollection < handle
             %   Detailed explanation goes here
             obj.ROIs{totalSliceNumber}.Frames{totalFrameNumber}.ROI{1} = [];
             obj.ROIs{slicenumber}.Frames{framenumber}.ROI{1} = polygon;
+            obj.ROIs{slicenumber}.Frames{framenumber}.Position{1} = polygon.Position;
             obj.Name = name;
             obj.Color = color;
             obj.Autotracking = 0;
