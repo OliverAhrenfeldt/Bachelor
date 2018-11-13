@@ -1,4 +1,4 @@
-%Test sortering
+fac%Test sortering
 % images = dir(fullfile('C:\Users\Mads_\OneDrive - Aarhus universitet\Bachelor\DICOM\BOLD Datasæt\197\CD-rom\A'));
 % 
 % wbar = waitbar(0,'Vi venter på indlæsning');

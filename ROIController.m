@@ -63,6 +63,8 @@ classdef ROIController < handle
         function DeleteROI(obj, idx, framenumber, slicenumber)
             for i=1:length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI)
                 delete(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{i});
+                obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{i} = [];
+                obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.Position{i} = [];
             end
         end
         
