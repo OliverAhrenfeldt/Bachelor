@@ -15,7 +15,8 @@ classdef ROICollection < handle
         function obj = Constructor(obj,name,totalFrameNumber, totalSliceNumber, color,framenumber,slicenumber,polygon)
             %UNTITLED2 Construct an instance of this class
             %   Detailed explanation goes here
-            obj.ROIs{totalSliceNumber}.Frames{totalFrameNumber}.ROI{1} = [];
+            
+            obj.createStructure(totalFrameNumber,totalSliceNumber);
             obj.ROIs{slicenumber}.Frames{framenumber}.ROI{1} = polygon;
             obj.ROIs{slicenumber}.Frames{framenumber}.Position{1} = polygon.Position;
             obj.Name = name;
@@ -25,10 +26,15 @@ classdef ROICollection < handle
             obj.AnalysisStatus = 0;
         end
         
-        function outputArg = method1(obj,inputArg)
+        function createStructure(obj,totalFrameNumber, totalSliceNumber)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            outputArg = obj.Property1 + inputArg;
+            for i=1: totalSliceNumber
+                for j=1: totalFrameNumber
+                    obj.ROIs{i}.Frames{j}.ROI{1} = [];
+                    obj.ROIs{i}.Frames{j}.Position{1} = [];
+                end
+            end
         end
     end
 end
