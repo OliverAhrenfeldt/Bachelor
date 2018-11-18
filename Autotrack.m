@@ -1,4 +1,4 @@
-classdef autotrack
+classdef Autotrack
     %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -16,13 +16,12 @@ classdef autotrack
         function startTracking(obj,inputArg)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            I1 = dicomread('D:\Aarhus universitet\Mads Nielsen - Bachelor\DICOM\BOLD Datasæt\198\CD-rom\A\Z834');
+            I1 = dicomread('D:\Aarhus universitet\Mads Nielsen - Bachelor\DICOM\BOLD Datasæt\198\CD-rom\A\Z894');
             I1norm = double(I1)/max(double(I1(:)));
             figure(1); imshow(I1norm); ROI= drawpolygon;
-            %'Position',[50,110;70,50;100,30]
             
             for i=1:size(ROI.Position,1)      
-                %% Setup
+                %% SETUP
                 % To find the angle bisector of every point in the ROI, the
                 % point of interest and the two adjacent points are
                 % identified:
@@ -110,18 +109,25 @@ classdef autotrack
                     [vhalv, avinkelhalv, bvinkelhalv] = obj.SC12(a_1, a_2, x2, y2);
                 end
                 
-                drawline('Position',vhalv,'Color','y');
+                    drawline('Position',vhalv,'Color','y');
                 
                 %% Creation of line segment
-                % To find a line segment, a circle is drawn. The center
-                % is the point of interest. The intersection between the
-                % circle and the angle bisector defines the line segment.
+                % To find a line segment, a circle is drawn. The cirlce 
+                % center is the point of interest. The intersection between 
+                % the circle and the angle bisector defines the line 
+                % segment.
                 
-%                 circle = drawcircle('Center', [x2,y2], 'Radius', 5);
-                % linecirc requires Mapping Toolbox
+%                 drawcircle('Center', [x2,y2], 'Radius', 5);
+
+                
+                % NOTICE: the 'linecirc' function requires 'Mapping
+                % Toolbox'
                 [xinter, yinter] = linecirc(avinkelhalv, bvinkelhalv, x2, y2, 5);
+%                 drawpoint('Position',[xinter(1),yinter(1)], 'Color', 'r');
+%                 drawpoint('Position',[xinter(2),yinter(2)], 'Color', 'r');
+                [lineSegPixelCoords, lineSegPixelIndex] = obj.lineSeg(xinter, yinter, I1norm);
                 
-                
+                %% 
                 
                 
                 
@@ -344,6 +350,38 @@ classdef autotrack
             punkt2 = [punkt2x, punkt2y];
             
             vhalvlinje = [punkt1; punkt2];
+        end
+        
+        function [lineSegPixelCoords, lineSegPixelIndex] = lineSeg(obj, xinter, yinter, I1norm)
+            x1=xinter(1); y1=yinter(1); x2=xinter(2); y2=yinter(2);
+            
+%             linePos = [x1,y1;x2,y2];
+%             drawline('Position',linePos,'Color','g','LineWidth',1);
+
+            % 20 points destributed evenly along the line segment. These
+            % will identify which pixels we are looking at.
+            n=20;
+            xPoints = linspace(x1,x2,n);
+            yPoints = linspace(y1,y2,n);
+
+            % The function 'round' is used to get an integer, representing the
+            % coordinates of the pixels the line segment cuts through
+            xPixels = round(xPoints);
+            yPixels = round(yPoints);
+
+            pixels = [xPixels;yPixels]';
+            
+            % There may be multiple points in the same pixel. These
+            % duplicates are removed with 'unique'.
+            lineSegPixelCoords = unique(pixels,'rows');
+            
+            lineSegPixelIndex = zeros(1,length(lineSegPixelCoords));
+            for i = 1:length(lineSegPixelCoords(:,1))
+                lineSegPixelIndex(i) = I1norm(lineSegPixelCoords(i,2),lineSegPixelCoords(i,1));
+            end
+%             figure(2);
+%             imshow(I1norm);
+%             drawline('Position',linePos,'Color','g','LineWidth',1);
         end
                 
         function outputArg = getpixelsonline(obj,inputArg)
