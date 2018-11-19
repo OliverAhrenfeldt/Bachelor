@@ -13,12 +13,21 @@ classdef Autotrack
             obj.Property1 = inputArg1 + inputArg2;
         end
         
-        function startTracking(obj,inputArg)
+        function TrackImage(obj,image,OldROI, threshold)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            I1 = dicomread('D:\Aarhus universitet\Mads Nielsen - Bachelor\DICOM\BOLD Datasæt\198\CD-rom\A\Z894');
+            I1 = dicomread('C:\Users\Mads_\OneDrive - Aarhus universitet\Bachelor\DICOM\BOLD Datasæt\198\CD-rom\A\Z894');
             I1norm = double(I1)/max(double(I1(:)));
             figure(1); imshow(I1norm); ROI= drawpolygon;
+            
+            %Vi finder centerlinjen gennem ROI'et, for at bestemme hvilken
+            %retning ud fra hvert punkt der er hhv. mod midten af ROIet og
+            %væk fra ROI'et. Løsningen til at finde denne centerlinje er
+            %fundet med inspiration fra Samuels slides fra BDP:
+            mask = poly2mask(ROI.Position(:,1),ROI.Position(:,2),128,128);
+            skeleton = bwmorph(mask,'skel',Inf);
+            centerline = bwmorph(skeleton,'spur',10);
+            [xCenterlineIdx, yCenterlineIdx] = find(centerline==1);
             
             for i=1:size(ROI.Position,1)      
                 %% SETUP
@@ -117,7 +126,7 @@ classdef Autotrack
                 % the circle and the angle bisector defines the line 
                 % segment.
                 
-%                 drawcircle('Center', [x2,y2], 'Radius', 5);
+                %drawcircle('Center', [x2,y2], 'Radius', 5);
 
                 
                 % NOTICE: the 'linecirc' function requires 'Mapping
@@ -125,10 +134,10 @@ classdef Autotrack
                 [xinter, yinter] = linecirc(avinkelhalv, bvinkelhalv, x2, y2, 5);
 %                 drawpoint('Position',[xinter(1),yinter(1)], 'Color', 'r');
 %                 drawpoint('Position',[xinter(2),yinter(2)], 'Color', 'r');
-                [lineSegPixelCoords, lineSegPixelIndex] = obj.lineSeg(xinter, yinter, I1norm);
-                
+                [lineSegPixelCoords, lineSegPixelIndex] = obj.lineSeg(xinter, yinter, I1norm);                
                 %% 
-                
+                [xNew, yNew] = obj.Edgedetection(xCenterlineIdx, yCenterlineIdx, lineSegPixelCoords, lineSegPixelIndex,0.15, [x2,y2]);
+                drawpoint('Position',[xNew,yNew], 'Color', 'r');                 
                 
                 
             end
@@ -360,10 +369,11 @@ classdef Autotrack
 
             % 20 points destributed evenly along the line segment. These
             % will identify which pixels we are looking at.
-            n=20;
+            n=26;
             xPoints = linspace(x1,x2,n);
             yPoints = linspace(y1,y2,n);
-
+            
+            lineSegPixelCoords = [xPoints;yPoints]';
             % The function 'round' is used to get an integer, representing the
             % coordinates of the pixels the line segment cuts through
             xPixels = round(xPoints);
@@ -371,23 +381,99 @@ classdef Autotrack
 
             pixels = [xPixels;yPixels]';
             
-            % There may be multiple points in the same pixel. These
-            % duplicates are removed with 'unique'.
-            lineSegPixelCoords = unique(pixels,'rows');
-            
-            lineSegPixelIndex = zeros(1,length(lineSegPixelCoords));
-            for i = 1:length(lineSegPixelCoords(:,1))
-                lineSegPixelIndex(i) = I1norm(lineSegPixelCoords(i,2),lineSegPixelCoords(i,1));
+
+            for i = 1:length(pixels(:,1))
+                lineSegPixelIndex(i) = I1norm(pixels(i,2),pixels(i,1));
             end
 %             figure(2);
 %             imshow(I1norm);
 %             drawline('Position',linePos,'Color','g','LineWidth',1);
         end
                 
-        function outputArg = getpixelsonline(obj,inputArg)
+        function [xEdge, yEdge] = Edgedetection(obj, xCenterlineIdx, yCenterlineIdx, lineSegPixelCoords, longLineSegPixelIndex,threshold, oldPoint)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            outputArg = obj.Property1 + inputArg;
+            
+            lineSegPixelIndex = zeros(1,length(longLineSegPixelIndex)-6);
+            counter = 1;
+            for i = 4:length(longLineSegPixelIndex)-3
+                lineSegPixelIndex(counter)=longLineSegPixelIndex(i);
+                counter = counter+1;
+            end
+            
+            centerLineDistances = zeros(size(xCenterlineIdx));
+            for i=1:length(centerLineDistances)              
+                dist = sqrt(((oldPoint(1)-xCenterlineIdx(i))^2)+((oldPoint(2)-yCenterlineIdx(i))^2));
+                centerLineDistances(i)=dist;
+            end
+            
+            [~, minCenterDistanceIdx] = min(centerLineDistances);
+            xComparison = xCenterlineIdx(minCenterDistanceIdx);
+            yComparison = yCenterlineIdx(minCenterDistanceIdx);
+            
+            filter = [-1 0 1];
+            %Kilde til replicate. Vi bruger replicate, for at der ikke
+            %identificeres en ikke-eksisterende kant i slutningen af
+            %arrayet pga. zero padding.
+            %https://se.mathworks.com/help/images/imfilter-boundary-padding-options.html
+            edgeArray = abs(imfilter(lineSegPixelIndex, filter,'replicate'));
+            binaryEdgeArray = zeros(size(edgeArray));
+            for i=1:length(edgeArray)
+                if(edgeArray(i)>threshold)
+                    binaryEdgeArray(i)=1;
+                end
+            end
+            
+            idxEdges = find(binaryEdgeArray==1);
+            if(length(idxEdges)>1)
+                distArray = zeros(size(idxEdges));
+                for i=1:length(idxEdges)
+                    x = lineSegPixelCoords(idxEdges(i)+3,1);
+                    y = lineSegPixelCoords(idxEdges(i)+3,2);
+                    dist = sqrt(((oldPoint(1)-x)^2)+((oldPoint(2)-y)^2));
+                    distArray(i) = dist;
+                end
+                [~,minIdx] = min(distArray);
+                edgeIndex = idxEdges(minIdx);
+                
+                xPotential1 = lineSegPixelCoords(3+edgeIndex-3,1);
+                yPotential1 = lineSegPixelCoords(3+edgeIndex-3,2);
+                dist1 = sqrt(((xComparison-xPotential1)^2)+((yComparison-yPotential1)^2));
+                
+                xPotential2 = lineSegPixelCoords(3+edgeIndex+3,1);
+                yPotential2 = lineSegPixelCoords(3+edgeIndex+3,2);
+                dist2 = sqrt(((xComparison-xPotential2)^2)+((yComparison-yPotential2)^2));
+                
+                if(dist1<dist2)
+                    xEdge = xPotential1;
+                    yEdge = yPotential1;
+                else
+                    xEdge = xPotential2;
+                    yEdge = yPotential2;
+                end
+                
+            elseif(length(idxEdges)==1)
+                
+                xPotential1 = lineSegPixelCoords(3+idxEdges-3,1);
+                yPotential1 = lineSegPixelCoords(3+idxEdges-3,2);
+                dist1 = sqrt(((xComparison-xPotential1)^2)+((yComparison-yPotential1)^2));
+                
+                xPotential2 = lineSegPixelCoords(3+idxEdges+3,1);
+                yPotential2 = lineSegPixelCoords(3+idxEdges+3,2);
+                dist2 = sqrt(((xComparison-xPotential2)^2)+((yComparison-yPotential2)^2));
+                
+                if(dist1<dist2)
+                    xEdge = xPotential1;
+                    yEdge = yPotential1;
+                else
+                    xEdge = xPotential2;
+                    yEdge = yPotential2;
+                end
+                
+            else
+                xEdge = oldPoint(1);
+                yEdge = oldPoint(2);
+            end
         end
     end
 end
