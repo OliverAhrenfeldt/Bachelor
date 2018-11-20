@@ -13,18 +13,23 @@ classdef Autotrack
             obj.Property1 = inputArg1 + inputArg2;
         end
         
-        function TrackImage(obj,image,OldROI, threshold)
+        function newROI = TrackImage(obj,image,OldROI, threshold)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            I1 = dicomread('C:\Users\Mads_\OneDrive - Aarhus universitet\Bachelor\DICOM\BOLD Datasæt\198\CD-rom\A\Z894');
-            I1norm = double(I1)/max(double(I1(:)));
-            figure(1); imshow(I1norm); ROI= drawpolygon;
+            %I1 = dicomread('C:\Users\Mads_\OneDrive - Aarhus universitet\Bachelor\DICOM\BOLD Datasæt\198\CD-rom\A\Z894');
             
+            ROI.Position = OldROI;
+            %Tror vi skal fjerne normaliseringen og finde et threshold
+            %baseret på std i det forrige roi, og så gøre det hele på det
+            %ikke normaliserede billede.
+            I1norm = double(image)/max(double(image(:)));
+%             figure(1); imshow(I1norm); ROI= drawpolygon;
+            newROI = zeros(size(ROI.Position));
             %Vi finder centerlinjen gennem ROI'et, for at bestemme hvilken
             %retning ud fra hvert punkt der er hhv. mod midten af ROIet og
             %væk fra ROI'et. Løsningen til at finde denne centerlinje er
             %fundet med inspiration fra Samuels slides fra BDP:
-            mask = poly2mask(ROI.Position(:,1),ROI.Position(:,2),128,128);
+            mask = poly2mask(ROI.Position(:,1),ROI.Position(:,2),size(image,1),size(image,2));
             skeleton = bwmorph(mask,'skel',Inf);
             centerline = bwmorph(skeleton,'spur',10);
             [xCenterlineIdx, yCenterlineIdx] = find(centerline==1);
@@ -118,8 +123,6 @@ classdef Autotrack
                     [vhalv, avinkelhalv, bvinkelhalv] = obj.SC12(a_1, a_2, x2, y2);
                 end
                 
-                    drawline('Position',vhalv,'Color','y');
-                
                 %% Creation of line segment
                 % To find a line segment, a circle is drawn. The cirlce 
                 % center is the point of interest. The intersection between 
@@ -136,10 +139,10 @@ classdef Autotrack
 %                 drawpoint('Position',[xinter(2),yinter(2)], 'Color', 'r');
                 [lineSegPixelCoords, lineSegPixelIndex] = obj.lineSeg(xinter, yinter, I1norm);                
                 %% 
-                [xNew, yNew] = obj.Edgedetection(xCenterlineIdx, yCenterlineIdx, lineSegPixelCoords, lineSegPixelIndex,0.15, [x2,y2]);
-                drawpoint('Position',[xNew,yNew], 'Color', 'r');                 
-                
-                
+                [xNew, yNew] = obj.Edgedetection(xCenterlineIdx, yCenterlineIdx, lineSegPixelCoords, lineSegPixelIndex,threshold, [x2,y2]);
+%                 drawpoint('Position',[xNew,yNew], 'Color', 'r');                 
+               newROI(i,1)=xNew;
+               newROI(i,2)=yNew;             
             end
         end
         

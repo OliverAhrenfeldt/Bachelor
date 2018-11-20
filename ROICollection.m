@@ -14,8 +14,7 @@ classdef ROICollection < handle
     methods
         function obj = Constructor(obj,name,totalFrameNumber, totalSliceNumber, color,framenumber,slicenumber,polygon)
             %UNTITLED2 Construct an instance of this class
-            %   Detailed explanation goes here
-            
+            %   Detailed explanation goes here           
             obj.createStructure(totalFrameNumber,totalSliceNumber);
             obj.ROIs{slicenumber}.Frames{framenumber}.ROI{1} = polygon;
             obj.ROIs{slicenumber}.Frames{framenumber}.Position{1} = polygon.Position;

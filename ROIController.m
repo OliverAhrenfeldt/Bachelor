@@ -4,13 +4,14 @@ classdef ROIController < handle
     
     properties
         ROICollections;
+        Autotracker;
     end
     
     methods
-        function obj = Constructor(inputArg1,inputArg2)
+        function obj = Constructor(obj)
             %UNTITLED Construct an instance of this class
             %   Detailed explanation goes here
-            obj.Property1 = inputArg1 + inputArg2;
+            obj.Autotracker = Autotrack();
         end
         
         function AddNewCollection(obj,name,totalFrameNumber, totalSliceNumber, color,framenumber,slicenumber,polygon)
@@ -84,6 +85,21 @@ classdef ROIController < handle
             obj.ROICollections(length(obj.ROICollections)) = [];
         end
         
+        function StartAutotracking(obj,dicomDisplay, slicenumber, framenumber, totalFrames, collectionIdx)
+            obj.Autotracker = Autotrack();
+            %counter = framenumber+1;
+            for i=framenumber+1:totalFrames
+                image = dicomDisplay.dicom_files{slicenumber}.DTO{framenumber+1}.pixelData;
+                for j=1: length(obj.ROICollections{collectionIdx}.ROIs{slicenumber}.Frames{framenumber}.Position)
+                    prevROI = obj.ROICollections{collectionIdx}.ROIs{slicenumber}.Frames{framenumber}.Position{j};
+                    if(~isempty(prevROI))
+                        newROI = obj.Autotracker.TrackImage(image,prevROI,0.15); %OBS threshold skal være relativt baseret på std
+                        obj.ROICollections{collectionIdx}.ROIs{slicenumber}.Frames{framenumber+1}.Position{length(obj.ROICollections{collectionIdx}.ROIs{slicenumber}.Frames{framenumber+1}.Position)+1} = newROI;
+                    end
+                end
+                framenumber = framenumber+1;
+            end
+        end
     end
 end
 
