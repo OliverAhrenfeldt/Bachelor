@@ -43,7 +43,7 @@ classdef ROIController < handle
             end
         end
         
-        function ROITable = getROITable(obj)
+        function [cola, colb] = getROITable(obj)
             
             if (isempty(obj.ROICollections) == 0)
                 cola = obj.getNames()';
@@ -55,10 +55,15 @@ classdef ROIController < handle
                         colb{i} = true;
                     end
                 end
-                ROITable = table(cola,colb'); 
+                colb = colb';
             else
-                ROITable = {};
+                cola = {};
+                colb = {};
             end
+        end
+        
+        function setAnalysisStatus(obj,collectionIndex,status)
+            obj.ROICollections{collectionIndex}.AnalysisStatus = status;
         end
         
         function DeleteROI(obj, idx, framenumber, slicenumber)
