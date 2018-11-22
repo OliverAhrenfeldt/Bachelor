@@ -1,4 +1,4 @@
-classdef DicomDisplay
+classdef DicomDisplay < handle
     %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -27,7 +27,7 @@ classdef DicomDisplay
             dicomFile.dicomInfo = obj.CreateTable(dicomFile.dicomInfo);
         end
         
-        function [dicomFile, object, numberOfFrames, numberOfSlices] = ReadDicomFiles(obj, path)
+        function [dicomFile, numberOfFrames, numberOfSlices] = ReadDicomFiles(obj, path)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             
@@ -50,7 +50,7 @@ classdef DicomDisplay
             %vise infoen på GUI'en
             dicomFile.dicomInfo = obj.CreateTable(dicomFile.dicomInfo);
             
-            object = obj;
+%             object = obj;
             
             numberOfFrames = length(obj.dicom_files{1}.DTO);
             numberOfSlices = length(obj.dicom_files);
