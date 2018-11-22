@@ -22,7 +22,7 @@ classdef ROICollection < handle
             obj.Color = color;
             obj.Autotracking = 0;
             obj.D3ROI = 0;
-            obj.AnalysisStatus = 0;
+            obj.AnalysisStatus = 1;
         end
         
         function createStructure(obj,totalFrameNumber, totalSliceNumber)

@@ -2,7 +2,6 @@ classdef BOLDAnalyzer<handle
     %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
 
-    
     methods
         function [AbsCollectionValues, RelValues] = UpdateAnalysis(obj,DicomDisplay, ROIController, baseline)
             %UNTITLED Construct an instance of this class
