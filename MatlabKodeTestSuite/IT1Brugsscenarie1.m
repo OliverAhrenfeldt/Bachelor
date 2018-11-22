@@ -4,7 +4,7 @@ classdef IT1Brugsscenarie1 < matlab.unittest.TestCase
     
      methods (Static)
        
-       function [ReaderObj paths] = Setup1() %Arrange
+       function [ReaderObj paths] = Setup() %Arrange
            addpath ../
            
            DicomFilesPath = {
@@ -21,28 +21,14 @@ classdef IT1Brugsscenarie1 < matlab.unittest.TestCase
                 paths{i} = dir(fullfile(DicomFilesPath{i}));
             end
             
-       end    
-       
-       
-        function [DicomDisplayObj path2_1] = Setup2() %Arrange
-           addpath ../
-           
-            structPath = dir;
-            charPath = structPath(1,1).folder;
-            newCharPath = charPath(:,[1:69]);
-            path2_1 = strcat(newCharPath,'TestData_IT2Brugsscenarie1');
-            
-   
-            DicomDisplayObj = DicomDisplay;
-            DicomDisplayObj = DicomDisplayObj.Constructor();
-       end       
-       
-    end
-      
+       end
+     end
+     
+     
     methods (Test)
         
         function ReadDicomFiles1_1(testCase)
-            [ReaderObj paths] = IT1Brugsscenarie1.Setup1();
+            [ReaderObj paths] = IT1Brugsscenarie1.Setup();
             
             [Dicom_Sorted Dicom_Localizer] = ReaderObj.ReadDicomFiles(paths); %Act
                   
@@ -56,7 +42,7 @@ classdef IT1Brugsscenarie1 < matlab.unittest.TestCase
         end   
         
         function ReadDicomFiles1_2(testCase)
-            [ReaderObj paths] = IT1Brugsscenarie1.Setup1();
+            [ReaderObj paths] = IT1Brugsscenarie1.Setup();
             
             paths = paths(:,[1 2]);
             
@@ -69,10 +55,11 @@ classdef IT1Brugsscenarie1 < matlab.unittest.TestCase
             actSolution = length(Dicom_Localizer);
             expSolution = 0;
             testCase.verifyEqual(actSolution,expSolution); %Assert
-        end  
+        end
+        
         
         function ReadDicomFiles1_3(testCase)
-            [ReaderObj paths] = IT1Brugsscenarie1.Setup1();
+            [ReaderObj paths] = IT1Brugsscenarie1.Setup();
             
             paths = paths(:,3);
             
@@ -86,30 +73,6 @@ classdef IT1Brugsscenarie1 < matlab.unittest.TestCase
             expSolution = 1;
             testCase.verifyEqual(actSolution,expSolution); %Assert
         end  
-        
-        function ReadDicomFiles2_1(testCase)
-            [DicomDisplayObj path] = IT1Brugsscenarie1.Setup2();
-            
-            DicomDisplayObj.ReadDicomFiles(path); %Act
-                  
-            actSolution = length(DicomDisplayObj.dicom_files);
-            expSolution = 2;
-            testCase.verifyEqual(actSolution,expSolution); %Assert
-        end  
-        
-        
-        function ReadDicomFiles2_2(testCase)
-            [DicomDisplayObj path] = IT1Brugsscenarie1.Setup2();
-            
-            DicomDisplayObj.ReadDicomFiles(path); %Act
-                  
-            actSolution = length(DicomDisplayObj.dicom_files{1}.DTO);
-            expSolution = 1;
-            testCase.verifyEqual(actSolution,expSolution); %Assert
-        end 
-        
-        
-
     end
 end
 
