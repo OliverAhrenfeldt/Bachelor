@@ -15,34 +15,79 @@ classdef UutDataAccessor < matlab.unittest.TestCase
                };
            
             for i = 1:length(DicomFilesPath)
-                paths{i} = dir(fullfile(DicomFilesPath{i+1}));
+                paths{i} = dir(fullfile(DicomFilesPath{i}));
             end
                      
             DataAccessObj = DataAccessor; 
-     
+            
+            
        end       
     end
     
     
-    
-    
-    
-    
     methods (Test)
         
-        function SortDicomFiles1_1(testCase)
-            [uut dto] = UutReader.StaticSetup();
+        function Dicomread2_1(testCase)
+            [uut paths] = UutDataAccessor.Setup();
             
-            %Filtrere unødvendige DICOM filer for testcasen
-            dtoTest = dto(:,[1 2]);
+            %Filtrere unødvendige paths for testcasen
+            path = paths(:,1);
               
-            [Dicom_Sorted Dicom_Localizer] = uut.SortDicomFiles(dtoTest); %Act
+            pixelData = uut.Dicomread(path); %Act
             
-            
-            actSolution = length(Dicom_Localizer);
-            expSolution = 0;
+            actSolution = size(pixelData);
+            expSolution = [128 128];
             testCase.verifyEqual(actSolution,expSolution); %Assert
         end 
+        
+         function Dicomread2_2(testCase)
+            [uut paths] = UutDataAccessor.Setup();
+            
+            %Filtrere unødvendige paths for testcasen
+            path = paths(:,2);
+              
+            pixelData = uut.Dicomread(path); %Act
+            
+            actSolution = max(pixelData(:));
+            expSolution = uint16(0);
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+            
+            actSolution = min(pixelData(:));
+            expSolution = uint16(0);
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+         end 
+        
+         function Dicomread2_3(testCase)
+            [uut paths] = UutDataAccessor.Setup();
+            
+            %Filtrere unødvendige paths for testcasen
+            path = paths(:,3);
+              
+            pixelData = uut.Dicomread(path); %Act
+            
+            actSolution = max(pixelData(:));
+            expSolution = uint16(65535);
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+            
+            actSolution = min(pixelData(:));
+            expSolution = uint16(65535);
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+         end 
+        
+         function Dicominfo2_4(testCase)
+            [uut paths] = UutDataAccessor.Setup();
+            
+            %Filtrere unødvendige paths for testcasen
+            path = paths(:,1);
+              
+            metaData = uut.Dicominfo(path); %Act
+            
+            actSolution = metaData.SeriesDescription;
+            expSolution = '2D GE EPI SS 1';
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+         end     
+        
+         
     end
 end
 

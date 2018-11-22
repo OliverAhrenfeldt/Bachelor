@@ -46,7 +46,7 @@ classdef UutReader < matlab.unittest.TestCase
     methods (Test)
         
         function SortDicomFiles1_1(testCase)
-            [uut dto] = UutReader.StaticSetup();
+            [uut dto] = UutReader.Setup();
             
             %Filtrere unødvendige DICOM filer for testcasen
             dtoTest = dto(:,[1 2]);
@@ -63,7 +63,7 @@ classdef UutReader < matlab.unittest.TestCase
         end 
         
          function SortDicomFiles1_2(testCase)
-            [uut dto] = UutReader.StaticSetup();
+            [uut dto] = UutReader.Setup();
             
             %Filtrere unødvendige DICOM filer for testcasen
             dtoTest = dto(:,[1 2 3 5 6]);
@@ -81,7 +81,7 @@ classdef UutReader < matlab.unittest.TestCase
               
          
          function SortDicomFiles1_3(testCase)
-            [uut dto] = UutReader.StaticSetup();
+            [uut dto] = UutReader.Setup();
             
             %Filtrere unødvendige DICOM filer for testcasen
             dtoTest = dto(:,[1 2 5 6]);
@@ -98,7 +98,7 @@ classdef UutReader < matlab.unittest.TestCase
          end
         
          function SortDicomFiles1_4(testCase)
-            [uut dto] = UutReader.StaticSetup();
+            [uut dto] = UutReader.Setup();
             
             %Filtrere unødvendige DICOM filer for testcasen
             dtoTest = dto(:,[1 2 4]);
@@ -115,7 +115,7 @@ classdef UutReader < matlab.unittest.TestCase
          end
         
          function SortDicomFiles1_5(testCase)
-            [uut dto] = UutReader.StaticSetup();
+            [uut dto] = UutReader.Setup();
             
             %Filtrere unødvendige DICOM filer for testcasen
             dtoTest = dto(:,[1 2 4 5 6]);
@@ -132,7 +132,7 @@ classdef UutReader < matlab.unittest.TestCase
          end
         
          function SortDicomFiles1_6(testCase)
-            [uut dto] = UutReader.StaticSetup();
+            [uut dto] = UutReader.Setup();
             
             %Filtrere unødvendige DICOM filer for testcasen
             dtoTest = dto(:,[1 2 3 4 5 6]);
@@ -150,7 +150,7 @@ classdef UutReader < matlab.unittest.TestCase
         
          
          function SortDicomFiles1_7(testCase)
-            [uut dto] = UutReader.StaticSetup();
+            [uut dto] = UutReader.Setup();
             
             %Filtrere unødvendige DICOM filer for testcasen
             dtoTest = dto(:,4);
@@ -168,7 +168,7 @@ classdef UutReader < matlab.unittest.TestCase
         
          
          function SortDicomFiles1_8(testCase)
-            [uut dto] = UutReader.StaticSetup();
+            [uut dto] = UutReader.Setup();
             
             %Filtrere unødvendige DICOM filer for testcasen
             dtoTest(1,1) = dto(:,5);
@@ -191,7 +191,7 @@ classdef UutReader < matlab.unittest.TestCase
          
          
           function SortSlices1_9(testCase)
-            [uut dto] = UutReader.StaticSetup();
+            [uut dto] = UutReader.Setup();
             
             %Filtrere unødvendige DICOM filer for testcasen
             dtoTest(1,1) = dto(:,2);
@@ -211,7 +211,7 @@ classdef UutReader < matlab.unittest.TestCase
           end
           
           function SortSlices1_10(testCase)
-            [uut dto] = UutReader.StaticSetup();
+            [uut dto] = UutReader.Setup();
             
             %Filtrere unødvendige DICOM filer for testcasen
             dtoTest(1,1) = dto(:,1);
@@ -232,7 +232,7 @@ classdef UutReader < matlab.unittest.TestCase
           
         
           function SortFrames1_11(testCase)
-            [uut dto] = UutReader.StaticSetup();
+            [uut dto] = UutReader.Setup();
             
             %Filtrere unødvendige DICOM filer for testcasen
             dtoTest(1,1) = dto(:,7);
@@ -252,7 +252,7 @@ classdef UutReader < matlab.unittest.TestCase
           end
           
           function SortFrames1_12(testCase)
-            [uut dto] = UutReader.StaticSetup();
+            [uut dto] = UutReader.Setup();
             
             %Filtrere unødvendige DICOM filer for testcasen
             dtoTest(1,1) = dto(:,1);
@@ -272,7 +272,7 @@ classdef UutReader < matlab.unittest.TestCase
           end
         
         function ReadDicomFiles1_13(testCase)
-            [uut dto path] = UutReader.StaticSetup();
+            [uut dto path] = UutReader.Setup();
             
             
             %SortDicomFiles funktionen kaldes, da den kalder SortSlices
