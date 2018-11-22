@@ -4,11 +4,12 @@ classdef BOLDAnalyzer<handle
 
     
     methods
-        function [AbsValues, RelValues] = UpdateAnalysis(obj,DicomDisplay, ROIController, baseline)
+        function [AbsCollectionValues, RelValues] = UpdateAnalysis(obj,DicomDisplay, ROIController, baseline)
             %UNTITLED Construct an instance of this class
             %   Detailed explanation goes here
             ROI = {};
             AbsValues(1) = 0;
+            AbsCollectionValues= {};
             for i =1: length(ROIController.ROICollections)
                 if(ROIController.ROICollections{i}.AnalysisStatus == 1)
                     for j = 1: length(ROIController.ROICollections{i}.ROIs{1}.Frames)
@@ -28,9 +29,13 @@ classdef BOLDAnalyzer<handle
                             end
                         end
                     end
-                    
+                    Xtotal = (1:length(DicomDisplay.dicom_files{1}.DTO));
+                    idx = find(AbsValues>0);
+                    AbsValuesFound = AbsValues(idx);
+                    XFound = Xtotal(idx);
+                    AbsCollectionValues{i}.CollectionValues = AbsValuesFound;
+                    AbsCollectionValues{i}.XValues = XFound;
                 end
-                
             end
         end
         
