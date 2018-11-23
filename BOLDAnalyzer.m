@@ -57,7 +57,7 @@ classdef BOLDAnalyzer<handle
             meanValue = mean(image(idx));
         end
         
-        function outputArg = GetRelativeValues(absoluteValues,baselinevalue)
+        function relativeValues = GetRelativeValues(absoluteValues,baselinevalue)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             outputArg = obj.Property1 + inputArg;
