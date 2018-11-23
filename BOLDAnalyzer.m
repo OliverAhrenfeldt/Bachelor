@@ -68,6 +68,21 @@ classdef BOLDAnalyzer<handle
             %   Detailed explanation goes here
             outputArg = obj.Property1 + inputArg;
         end
+        
+        function [averageVal, standardDev] = GetFrameMeanAndStd(obj,ROIController, collectionIndex, frameNumber, sliceNumber, dicomDisplay)
+            image = dicomDisplay.dicom_files{sliceNumber}.DTO{frameNumber}.pixelData;
+            for i= 1: length(ROIController.ROICollections{collectionIndex}.ROIs{sliceNumber}.Frames{frameNumber}.Position)
+                mask = zeros(size(image,1),size(image,2));
+                if(~isempty(ROIController.ROICollections{collectionIndex}.ROIs{sliceNumber}.Frames{frameNumber}.Position{i}))
+                    ROI = ROIController.ROICollections{collectionIndex}.ROIs{sliceNumber}.Frames{frameNumber}.Position{i};
+                    mask = mask+ poly2mask(ROI(:,1),ROI(:,2),size(image,1),size(image,2));
+                end
+            end
+            
+            idx = find(mask>0);
+            averageVal = mean(image(idx));
+            standardDev = std2(image(idx));
+        end
     end
 end
 
