@@ -45,9 +45,14 @@ classdef FileHandler
             obj.fileAccessor.XLSXSave(path, outputCell);
         end
         
-        function MATSave(obj, dicomDisplay, RoiController)
+        function MATSave(obj, dicomDisplay, RoiController, path)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
+            
+            outputStruct{1} = dicomDisplay;
+            outputStruct{2} = RoiController;
+            
+            obj.fileAccessor.MATSave(outputStruct,path);
         end
         
         function outputArg = MATRead(obj, dicomDisplay, RoiController)

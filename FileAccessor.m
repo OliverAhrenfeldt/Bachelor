@@ -15,18 +15,17 @@ classdef FileAccessor
             msgbox({'File has been saved as an xlsx document at:';path},'Success','help')
         end
         
-        function MATSave(obj, dicomFiles, ROICollections, path)
+        function MATSave(obj, outputStruct, path)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            
+            save(path, 'outputStruct');
+            msgbox({'File has been saved as a MAT file at:';path},'Success','help')
         end
         
-        function MatFile = MATRead(obj, path)
+        function inputStruct = MATRead(obj, path)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            
-            MatFile = load(path);
-
+            inputStruct = load(path);
         end
         
         
