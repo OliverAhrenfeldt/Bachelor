@@ -17,12 +17,22 @@ classdef ROIController < handle
         function AddNewCollection(obj,name,totalFrameNumber, totalSliceNumber, color,framenumber,slicenumber,polygon)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
+            for i=2: size(polygon.Position,1)
+                if((polygon.Position(i,1) == polygon.Position(i-1,1)) && (polygon.Position(i,2) == polygon.Position(i-1,2)))
+                    polygon.Position(i,:) = [];
+                end
+            end
             RoiCollection = ROICollection;
             RoiCollection = RoiCollection.Constructor(name,totalFrameNumber, totalSliceNumber, color,framenumber,slicenumber,polygon);
             obj.ROICollections{length(obj.ROICollections)+1} = RoiCollection;
         end
         
         function AddROI(obj, idx, framenumber, slicenumber, polygon) 
+            for i=2: size(polygon.Position,1)
+                if((polygon.Position(i,1) == polygon.Position(i-1,1)) && (polygon.Position(i,2) == polygon.Position(i-1,2)))
+                    polygon.Position(i,:) = [];
+                end
+            end
             obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI)+1} = polygon;
             obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.Position{length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.Position)+1} = polygon.Position;
         end
