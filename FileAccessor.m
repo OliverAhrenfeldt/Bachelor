@@ -22,10 +22,10 @@ classdef FileAccessor
             msgbox({'File has been saved as a MAT file at:';path},'Success','help')
         end
         
-        function inputStruct = MATRead(obj, path)
+        function inputCell = MATRead(obj, path)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            inputStruct = load(path);
+            inputCell = load(path);
         end
         
         

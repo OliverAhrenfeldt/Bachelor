@@ -55,9 +55,14 @@ classdef FileHandler
             obj.fileAccessor.MATSave(outputStruct,path);
         end
         
-        function outputArg = MATRead(obj, dicomDisplay, RoiController)
+        function [dicomDisplay, RoiController] = MATRead(obj, path)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
+            
+            inputCell = obj.fileAccessor.MATRead(path);
+            
+            dicomDisplay = inputCell.outputStruct{1};
+            RoiController = inputCell.outputStruct{2};
         end
         
     end
