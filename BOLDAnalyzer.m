@@ -2,40 +2,98 @@ classdef BOLDAnalyzer<handle
     %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
 
+    properties
+        absValues;
+    end
+    
     methods
-        function [AbsCollectionValues, RelValues] = UpdateAnalysis(obj,DicomDisplay, ROIController, baseline)
+        
+        function obj = Constructor(obj)
+            %UNTITLED Construct an instance of this class
+            %   Detailed explanation goes here
+            obj.absValues{1}.CollectionValues = [];
+            obj.absValues{1}.XValues = [];
+        end
+    
+        function UpdateAnalysis(obj,DicomDisplay, ROIController)
             %UNTITLED Construct an instance of this class
             %   Detailed explanation goes here
             ROI = {};
-            AbsValues(1) = 0;
-            AbsCollectionValues= {};
+            AbsValues = zeros(1,length(DicomDisplay.dicom_files));
+            %AbsCollectionValues= {};
             for i =1: length(ROIController.ROICollections)
-                if(ROIController.ROICollections{i}.AnalysisStatus == 1)
-                    for j = 1: length(ROIController.ROICollections{i}.ROIs{1}.Frames)
-                        AbsValues(j)=0;
-                        for k =1: length(ROIController.ROICollections{i}.ROIs)
-                            counter = 1;
-                            for l=1:length(ROIController.ROICollections{i}.ROIs{k}.Frames{j}.Position)
-                                if(~isempty(ROIController.ROICollections{i}.ROIs{k}.Frames{j}.Position{l}))
-                                   ROI{counter} = ROIController.ROICollections{i}.ROIs{k}.Frames{j}.Position{l};
-                                   counter = counter+1;
-                                end
-                            end
-                            if(~isempty(ROI))
-                               mask = obj.SetMask(ROI,size(DicomDisplay.dicom_files{1}.DTO{1}.pixelData,1),size(DicomDisplay.dicom_files{1}.DTO{1}.pixelData,2));
-                               AbsValues(j) = AbsValues(j) + obj.GetAbsoluteValue(mask,DicomDisplay.dicom_files{k}.DTO{j}.pixelData);
-                               ROI = {};
+                for j = 1: length(ROIController.ROICollections{i}.ROIs{1}.Frames)
+                    AbsValues(j)=0;
+                    for k =1: length(ROIController.ROICollections{i}.ROIs)
+                        counter = 1;
+                        for l=1:length(ROIController.ROICollections{i}.ROIs{k}.Frames{j}.Position)
+                            if(~isempty(ROIController.ROICollections{i}.ROIs{k}.Frames{j}.Position{l}))
+                               ROI{counter} = ROIController.ROICollections{i}.ROIs{k}.Frames{j}.Position{l};
+                               counter = counter+1;
                             end
                         end
+                        if(~isempty(ROI))
+                           mask = obj.SetMask(ROI,size(DicomDisplay.dicom_files{1}.DTO{1}.pixelData,1),size(DicomDisplay.dicom_files{1}.DTO{1}.pixelData,2));
+                           AbsValues(j) = AbsValues(j) + obj.GetAbsoluteValue(mask,DicomDisplay.dicom_files{k}.DTO{j}.pixelData);
+                           ROI = {};
+                        end
                     end
-                    Xtotal = (1:length(DicomDisplay.dicom_files{1}.DTO));
-                    idx = find(AbsValues>0);
-                    AbsValuesFound = AbsValues(idx);
-                    XFound = Xtotal(idx);
-                    AbsCollectionValues{i}.CollectionValues = AbsValuesFound;
-                    AbsCollectionValues{i}.XValues = XFound;
+                end
+                Xtotal = (1:length(DicomDisplay.dicom_files{1}.DTO));
+                idx = find(AbsValues>0);
+                AbsValuesFound = AbsValues(idx);
+                XFound = Xtotal(idx);
+                %AbsCollectionValues{i}.CollectionValues = AbsValuesFound;
+                obj.absValues{i}.CollectionValues = AbsValuesFound;
+                %AbsCollectionValues{i}.XValues = XFound;
+                obj.absValues{i}.XValues = XFound;
+            end
+        end
+        
+        function AddValueForFrame(obj,CollectionIndex, DicomDisplay, ROIController, sliceNumber, frameNumber)
+            ROI = {};
+            AbsValues = zeros(1,length(DicomDisplay.dicom_files));
+            for h = 1: length(DicomDisplay.dicom_files)
+                counter = 1;
+                for i=1:length(ROIController.ROICollections{CollectionIndex}.ROIs{h}.Frames{frameNumber}.Position)
+                    if(~isempty(ROIController.ROICollections{CollectionIndex}.ROIs{h}.Frames{frameNumber}.Position{i}))
+                        ROI{counter} = ROIController.ROICollections{CollectionIndex}.ROIs{h}.Frames{frameNumber}.Position{i};
+                        counter = counter+1;
+                    end
+                end
+                if(~isempty(ROI))
+                    mask = obj.SetMask(ROI,size(DicomDisplay.dicom_files{h}.DTO{frameNumber}.pixelData,1),size(DicomDisplay.dicom_files{1}.DTO{1}.pixelData,2));
+                    AbsValues(h) = AbsValues(h) + obj.GetAbsoluteValue(mask,DicomDisplay.dicom_files{h}.DTO{frameNumber}.pixelData);
+                    ROI = {};
                 end
             end
+            xValue = DicomDisplay.dicom_files{1}.DTO{frameNumber}.dicomInfo.TemporalPositionIdentifier;
+            if(sum(AbsValues)~=0)
+                if(length(obj.absValues)>=CollectionIndex)
+                    valExist = find(obj.absValues{CollectionIndex}.XValues == xValue);
+                    if(isempty(valExist))
+                        obj.absValues{CollectionIndex}.XValues(length(obj.absValues{CollectionIndex}.XValues)+1) = xValue;
+                        obj.absValues{CollectionIndex}.CollectionValues(length(obj.absValues{CollectionIndex}.CollectionValues)+1) = sum(AbsValues);
+                        [~,idx] = sort(obj.absValues{CollectionIndex}.XValues);
+                        obj.absValues{CollectionIndex}.XValues = obj.absValues{CollectionIndex}.XValues(idx);
+                        obj.absValues{CollectionIndex}.CollectionValues = obj.absValues{CollectionIndex}.CollectionValues(idx);                
+                    else
+                        obj.absValues{CollectionIndex}.CollectionValues(valExist) = sum(AbsValues);                
+                    end
+                else
+                    obj.absValues{CollectionIndex}.XValues = xValue;
+                    obj.absValues{CollectionIndex}.CollectionValues = sum(AbsValues);
+                end
+            else
+                valExist = find(obj.absValues{CollectionIndex}.XValues == xValue);
+                if(~isempty(valExist))
+                    obj.absValues{CollectionIndex}.CollectionValues(valExist) = [];
+                    obj.absValues{CollectionIndex}.XValues(valExist) = [];
+                end
+            end
+            %obj.AbsValues{CollectionIndex}.CollectionValues(length(obj.AbsValues{CollectionIndex}.CollectionValues)+1) = 
+            %obj.AbsValues{CollectionIndex}.XValues(length(obj.AbsValues{CollectionIndex}.XValues)+1) = 
+            
         end
         
         function finalMask = SetMask(obj,ROIs, imageDim1,imageDim2)
@@ -44,9 +102,10 @@ classdef BOLDAnalyzer<handle
             finalMask = zeros(imageDim1,imageDim2);
             for i = 1: length(ROIs)
                 ROI = ROIs{i};
+                
                 finalMask = finalMask + poly2mask(ROI(:,1),ROI(:,2),imageDim1,imageDim2);
             end
-            [~,idx] = find(finalMask>0);
+            idx = find(finalMask>0);
             finalMask(idx) = 1;
         end
         
@@ -57,10 +116,10 @@ classdef BOLDAnalyzer<handle
             meanValue = mean(image(idx));
         end
         
-        function relativeValues = GetRelativeValues(absoluteValues,baselinevalue)
+        function relativeValues = GetRelativeValues(obj,absoluteValues,baselinevalue)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            outputArg = obj.Property1 + inputArg;
+            relativeValues = absoluteValues./baselinevalue;
         end
         
         function outputArg = SetBaseline(baselineValue)
@@ -82,6 +141,17 @@ classdef BOLDAnalyzer<handle
             idx = find(mask>0);
             averageVal = mean(image(idx));
             standardDev = std2(image(idx));
+        end
+        
+        function DeleteROICollection(obj,ROIRowIndex)
+            obj.absValues{ROIRowIndex} = [];
+            for i=ROIRowIndex+1:length(obj.absValues)
+                if (isempty(obj.absValues{i}) == 0)
+                    obj.absValues{i-1} = obj.absValues{i};
+                end
+            end
+            
+            obj.absValues(length(obj.absValues)) = [];
         end
     end
 end
