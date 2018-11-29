@@ -13,32 +13,47 @@ classdef FileHandler
             obj.fileAccessor = FileAccessor;
         end
         
-        function XLSXSave(obj, columnNames, boldValues, path)
+        function XLSXSave(obj, columnNames, absValues, relValues, totalFrames, path)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             
             % Identifying the amount of rows that need to be in the Excel
             % file.
-            largestNumberOfFrames = length(boldValues{1}.XValues);
-            for i=2:length(boldValues)
-                if(length(boldValues{i}.XValues) > largestNumberOfFrames)
-                    largestNumberOfFrames = length(boldValues{i}.XValues);
+            largestNumberOfFrames = length(absValues{1}.XValues);
+            for i=2:length(absValues)
+                if(length(absValues{i}.XValues) > largestNumberOfFrames)
+                    largestNumberOfFrames = length(absValues{i}.XValues);
                 end
             end
             
-            % Arranging the matrix for writing to the Excel file
-            outputMatrix(:,1) = linspace(1,largestNumberOfFrames,largestNumberOfFrames);
+            outputMatrixAbs(:,1) = linspace(1,totalFrames,totalFrames);
             
-            for i=1:length(boldValues)
+            % Arranging the matrices for writing to the Excel file
+%             outputMatrixAbs(:,1) = linspace(1,largestNumberOfFrames,largestNumberOfFrames);
+            
+            % Inputting the absolute values:
+            for i=1:length(absValues)
                 currentColumnArray=(zeros((largestNumberOfFrames),1));
-                for j=1:length(boldValues{i}.XValues)
-                    currentColumnArray(boldValues{i}.XValues(j),1)=boldValues{i}.CollectionValues(j);
+                for j=1:length(absValues{i}.XValues)
+                    currentColumnArray(absValues{i}.XValues(j),1)=absValues{i}.CollectionValues(j);
                 end
-                outputMatrix(:,i+1) = currentColumnArray';
+                outputMatrixAbs(:,i+1) = currentColumnArray';
             end
             
-            outputCell = num2cell(outputMatrix);
-            columnNames = [{'Frame no.'} columnNames];
+            % Inputting the relative values:
+            for i=1:length(absValues)
+                currentColumnArray=(zeros((largestNumberOfFrames),1));
+                currentRelColumn = relValues{i};
+                for j=1:length(absValues{i}.XValues)
+                    currentColumnArray(absValues{i}.XValues(j),1)=currentRelColumn(j);
+                end
+                outputMatrixRel(:,i) = currentColumnArray';
+            end
+            
+            outputCell = [outputMatrixAbs, outputMatrixRel];
+            outputCell = num2cell(outputCell);
+            
+            columnNames = [{'Frame no.'} columnNames columnNames];
             
             outputCell = [columnNames; outputCell];
             

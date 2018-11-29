@@ -12,14 +12,28 @@ classdef FileAccessor
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             xlswrite(path,outputCell);
-            msgbox({'File has been saved as an xlsx document at:';path},'Success','help')
+            
+            answer = questdlg({'File has been saved as a MAT file at:';path}, ...
+                'Success', ...
+                'OK','Open file','OK');
+            % Handle response
+            switch answer
+                case 'OK'
+                    
+                case 'Open file'
+                    winopen(path)
+            end
+            
+            
+            
+%             msgbox({'File has been saved as an xlsx document at:';path},'Success','help')
         end
         
         function MATSave(obj, outputStruct, path)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             save(path, 'outputStruct');
-            msgbox({'File has been saved as a MAT file at:';path},'Success','help')
+             msgbox({'File has been saved as a MAT file at:';path},'Success','help')
         end
         
         function inputCell = MATRead(obj, path)
