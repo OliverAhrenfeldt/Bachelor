@@ -22,7 +22,10 @@ classdef Autotrack
             %Tror vi skal fjerne normaliseringen og finde et threshold
             %baseret på std i det forrige roi, og så gøre det hele på det
             %ikke normaliserede billede.
-            I1norm = double(image)/max(double(image(:)));
+%             I1norm = double(image)/max(double(image(:)));
+            
+            I1norm = image;
+            
 %             figure(1); imshow(I1norm); ROI= drawpolygon;
             newROI = zeros(size(ROI.Position));
             %Vi finder centerlinjen gennem ROI'et, for at bestemme hvilken
@@ -43,7 +46,7 @@ classdef Autotrack
                     punkt1 = [ROI.Position(size(ROI.Position,1),1),ROI.Position(size(ROI.Position,1),2)];
                     punkt2 = [ROI.Position(1,1),ROI.Position(1,2)];
                     punkt3 = [ROI.Position(2,1),ROI.Position(2,2)];
-                    
+
                 elseif(i==size(ROI.Position,1))
                     punkt1 = [ROI.Position(i-1,1),ROI.Position(i-1,2)];
                     punkt2 = [ROI.Position(i,1),ROI.Position(i,2)];
@@ -53,10 +56,10 @@ classdef Autotrack
                     punkt2 = [ROI.Position(i,1),ROI.Position(i,2)];
                     punkt3 = [ROI.Position(i+1,1),ROI.Position(i+1,2)];
                 end
-                
+
                 x1 = punkt1(1);
                 y1 = punkt1(2);
-                
+
                 x2 = punkt2(1);
                 y2 = punkt2(2);
 
@@ -69,11 +72,18 @@ classdef Autotrack
                 a_2 = (y3 - y2)/(x3-x2);
                 b_2 = y2 - a_2*x2;
                 
+                a_3 = (y3 - y1)/(x3-x1);
+                b_3 = y1 - a_3*x1;
+                
+                % Used if no centerline is found in the ROI during
+                % skeletonization.
+                hypotenuse = obj.lineSeg([x1,x3], [y1,y3], I1norm);
+
                 %% Scenarios:
                 % The point of interest can be either to the left, right or
                 % in center of the two adjacent points.
                 left = false; right = false; center = false;
-                
+
                 if (x2-x1<0 && x2-x3<0)
                     left = true;
                 elseif (x2-x1>0 && x2-x3>0)
@@ -81,9 +91,9 @@ classdef Autotrack
                 else
                     center = true;
                 end
-                
+
                 % Source for method of angle calculation: https://www.studieportalen.dk/forums/Thread.aspx?id=568435&fbclid=IwAR0SbmeZVewMB-OOZwPCNLfHm6lJV52ulpYHTkH8oGZE4zvcFVukI5s0miM
-                
+
                 % All of the possible positions of the three points:
                 % Scenario 1:
                 if (a_1<0 && a_2<0 && left)
@@ -122,27 +132,34 @@ classdef Autotrack
                 elseif (a_1>0 && a_2<0 && center)
                     [vhalv, avinkelhalv, bvinkelhalv] = obj.SC12(a_1, a_2, x2, y2);
                 end
-                
+
                 %% Creation of line segment
                 % To find a line segment, a circle is drawn. The cirlce 
                 % center is the point of interest. The intersection between 
                 % the circle and the angle bisector defines the line 
                 % segment.
-                
+
                 %drawcircle('Center', [x2,y2], 'Radius', 5);
 
-                
+
                 % NOTICE: the 'linecirc' function requires 'Mapping
                 % Toolbox'
-                [xinter, yinter] = linecirc(avinkelhalv, bvinkelhalv, x2, y2, 5);
+                [xinter, yinter] = linecirc(avinkelhalv, bvinkelhalv, x2, y2, 2.5);
 %                 drawpoint('Position',[xinter(1),yinter(1)], 'Color', 'r');
 %                 drawpoint('Position',[xinter(2),yinter(2)], 'Color', 'r');
                 [lineSegPixelCoords, lineSegPixelIndex] = obj.lineSeg(xinter, yinter, I1norm);                
                 %% 
-                [xNew, yNew] = obj.Edgedetection(xCenterlineIdx, yCenterlineIdx, lineSegPixelCoords, lineSegPixelIndex,threshold, [x2,y2]);
-%                 drawpoint('Position',[xNew,yNew], 'Color', 'r');                 
-               newROI(i,1)=xNew;
-               newROI(i,2)=yNew;             
+                if(isempty(xCenterlineIdx))
+                   [xNew, yNew] = obj.Edgedetection(hypotenuse(:,1), hypotenuse(:,2), lineSegPixelCoords, lineSegPixelIndex,threshold, [x2,y2]);
+%                  drawpoint('Position',[xNew,yNew], 'Color', 'r');                 
+                   newROI(i,1)=xNew;
+                   newROI(i,2)=yNew;
+                else
+                   [xNew, yNew] = obj.Edgedetection(xCenterlineIdx, yCenterlineIdx, lineSegPixelCoords, lineSegPixelIndex,threshold, [x2,y2]);
+%                  drawpoint('Position',[xNew,yNew], 'Color', 'r');                 
+                   newROI(i,1)=xNew;
+                   newROI(i,2)=yNew;
+                end
             end
         end
         

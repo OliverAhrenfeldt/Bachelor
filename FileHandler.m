@@ -55,16 +55,23 @@ classdef FileHandler
             obj.fileAccessor.MATSave(outputStruct,path);
         end
         
-        function [dicomDisplay, RoiController] = MATRead(obj, path)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+        function [dicomDisplay, RoiController, dicomFile, numberOfFrames, numberOfSlices] = MATRead(obj, path)
+            %MATRead sets up the data received from FileAccessor
+            %   Returns the necessary variables to the GUI, to restore the
+            %   state in which it was saved by the user.
             
             inputCell = obj.fileAccessor.MATRead(path);
             
             dicomDisplay = inputCell.outputStruct{1};
             RoiController = inputCell.outputStruct{2};
-        end
-        
+            dicomFile = dicomDisplay.dicom_files{1}.DTO{1};
+            dicomFile = dicomDisplay.NormalizeFrame(dicomFile);
+            
+            numberOfFrames = length(dicomDisplay.dicom_files{1}.DTO);
+            numberOfSlices = length(dicomDisplay.dicom_files);
+            
+            dicomFile.dicomInfo = dicomDisplay.CreateTable(dicomFile.dicomInfo);
+        end        
     end
 end
 
