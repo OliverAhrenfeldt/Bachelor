@@ -17,8 +17,7 @@ classdef ContrastAdjuster
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             outputFrame = frame.^gamma;
-        end
-        
+        end        
         
         function outputFrame = HistogramEqualize(obj,frame)
             %METHOD1 Summary of this method goes here

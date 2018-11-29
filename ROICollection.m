@@ -33,7 +33,7 @@ classdef ROICollection < handle
                     obj.ROIs{i}.Frames{j}.ROI{1} = [];
                     obj.ROIs{i}.Frames{j}.Position{1} = [];
                 end
-            end
+            end 
         end
     end
 end
