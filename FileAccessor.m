@@ -13,23 +13,21 @@ classdef FileAccessor
             %   Detailed explanation goes here
             xlswrite(path,outputCell);
             
+            % Let the user know the Excel file has been saved, and ask if they
+            % want to open it right away.
             answer = questdlg({'File has been saved as a MAT file at:';path}, ...
                 'Success', ...
                 'OK','Open file','OK');
-            % Handle response
+            % Handle user response
             switch answer
                 case 'OK'
-                    
+                    % Nothing happens here
                 case 'Open file'
                     winopen(path)
             end
-            
-            
-            
-%             msgbox({'File has been saved as an xlsx document at:';path},'Success','help')
         end
         
-        function MATSave(obj, outputStruct, path)
+        function MATSave(obj, path, outputStruct)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             save(path, 'outputStruct');
