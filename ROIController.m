@@ -14,7 +14,7 @@ classdef ROIController < handle
             obj.Autotracker = Autotrack();
         end
         
-        function AddNewCollection(obj,name,totalFrameNumber, totalSliceNumber, color,framenumber,slicenumber,polygon)
+        function AddNewCollection(obj,name,totalFrameNumber, totalSliceNumber, color,framenumber,slicenumber,polygon, roiCollection)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             for i=2: size(polygon.Position,1)
@@ -22,7 +22,7 @@ classdef ROIController < handle
                     polygon.Position(i,:) = [];
                 end
             end
-            RoiCollection = ROICollection;
+            RoiCollection = roiCollection;
             RoiCollection = RoiCollection.Constructor(name,totalFrameNumber, totalSliceNumber, color,framenumber,slicenumber,polygon);
             obj.ROICollections{length(obj.ROICollections)+1} = RoiCollection;
         end
@@ -39,17 +39,17 @@ classdef ROIController < handle
         
         function Names = getNames(obj)
             for i =1:length(obj.ROICollections)
-                if (isempty(obj.ROICollections{i}) ~= 1)
+%                 if (isempty(obj.ROICollections{i}) ~= 1)
                     Names{i} = obj.ROICollections{i}.Name; 
-                end
+%                 end
             end
         end
         
         function AnalysisStatus = getAnalysisStatus(obj)
             for i =1:length(obj.ROICollections)
-                if (isempty(obj.ROICollections{i}) ~= 1)
+%                 if (isempty(obj.ROICollections{i}) ~= 1)
                     AnalysisStatus{i} = obj.ROICollections{i}.AnalysisStatus; 
-                end
+%                 end
             end
         end
         
@@ -84,11 +84,11 @@ classdef ROIController < handle
             end
         end
         
-        function DeleteROICollection(obj, idx, framenumber, slicenumber)
-            
-            for i=1:length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI)
-                delete(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{i});
-            end
+%         function DeleteROICollection(obj, idx, framenumber, slicenumber)
+            function DeleteROICollection(obj, idx)
+%             for i=1:length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI)
+%                 delete(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{i});
+%             end
             
             obj.ROICollections{idx} = [];
             for i=idx+1:length(obj.ROICollections)
