@@ -122,12 +122,6 @@ classdef BOLDAnalyzer<handle
             relativeValues = absoluteValues./baselinevalue;
         end
         
-        function outputArg = SetBaseline(baselineValue)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-            outputArg = obj.Property1 + inputArg;
-        end
-        
         function [averageVal, standardDev] = GetFrameMeanAndStd(obj,ROIController, collectionIndex, frameNumber, sliceNumber, dicomDisplay)
             image = dicomDisplay.dicom_files{sliceNumber}.DTO{frameNumber}.pixelData;
             for i= 1: length(ROIController.ROICollections{collectionIndex}.ROIs{sliceNumber}.Frames{frameNumber}.Position)

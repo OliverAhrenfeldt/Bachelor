@@ -164,6 +164,7 @@ classdef Autotrack
         end
         
         function [vhalvlinje, avinkelhalv, bvinkelhalv] = SC1andSC2(obj, a_1, a_2, x2, y2)
+       
             a_x = abs(atand(a_1));
             b_x = abs(atand(a_2));
             a_x_inner = (180-a_x);
@@ -448,10 +449,17 @@ classdef Autotrack
             if(length(idxEdges)>1)
                 distArray = zeros(size(idxEdges));
                 for i=1:length(idxEdges)
-                    x = lineSegPixelCoords(idxEdges(i)+3,1);
-                    y = lineSegPixelCoords(idxEdges(i)+3,2);
-                    dist = sqrt(((oldPoint(1)-x)^2)+((oldPoint(2)-y)^2));
-                    distArray(i) = dist;
+                    if(sqrt(((lineSegPixelCoords(idxEdges(1),1)-xComparison)^2)+((lineSegPixelCoords(idxEdges(1),1)-yComparison)^2)))
+                        x = lineSegPixelCoords(idxEdges(i)-3,1);
+                        y = lineSegPixelCoords(idxEdges(i)-3,2);
+                        dist = sqrt(((oldPoint(1)-x)^2)+((oldPoint(2)-y)^2));
+                        distArray(i) = dist;
+                    else
+                        x = lineSegPixelCoords(idxEdges(i)+3,1);
+                        y = lineSegPixelCoords(idxEdges(i)+3,2);
+                        dist = sqrt(((oldPoint(1)-x)^2)+((oldPoint(2)-y)^2));
+                        distArray(i) = dist;
+                    end
                 end
                 [~,minIdx] = min(distArray);
                 edgeIndex = idxEdges(minIdx);
