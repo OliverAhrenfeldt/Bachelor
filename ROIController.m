@@ -17,22 +17,44 @@ classdef ROIController < handle
         function AddNewCollection(obj,name,totalFrameNumber, totalSliceNumber, color,framenumber,slicenumber,polygon, roiCollection)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
+            counter = 1;
             for i=2: size(polygon.Position,1)
-                if((polygon.Position(i,1) == polygon.Position(i-1,1)) && (polygon.Position(i,2) == polygon.Position(i-1,2)))
-                    polygon.Position(i,:) = [];
+                if((polygon.Position(i,1) == polygon.Position(i-1,1)) && (polygon.Position(i,2) == polygon.Position(i-1,2))) 
+                    polyIndex(counter) = i;
+                    counter = counter + 1;
                 end
             end
+            
+            if(exist('polyIndex','var'))
+                for i=1: length(polyIndex)
+                 polygon.Position(polyIndex(i),:)= [];
+                 polyIndex = polyIndex - 1;
+                end 
+            end
+            
             RoiCollection = roiCollection;
             RoiCollection = RoiCollection.Constructor(name,totalFrameNumber, totalSliceNumber, color,framenumber,slicenumber,polygon);
             obj.ROICollections{length(obj.ROICollections)+1} = RoiCollection;
         end
         
         function AddROI(obj, idx, framenumber, slicenumber, polygon) 
+           
+             counter = 1;
             for i=2: size(polygon.Position,1)
                 if((polygon.Position(i,1) == polygon.Position(i-1,1)) && (polygon.Position(i,2) == polygon.Position(i-1,2)))
-                    polygon.Position(i,:) = [];
+                    
+                    polyIndex(counter) = i;
+                    counter = counter + 1;
                 end
             end
+            
+            if(exist('polyIndex','var'))
+                for i=1: length(polyIndex)
+                 polygon.Position(polyIndex(i),:)= [];
+                 polyIndex = polyIndex - 1;
+                end 
+            end
+            
             obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI)+1} = polygon;
             obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.Position{length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.Position)+1} = polygon.Position;
         end
