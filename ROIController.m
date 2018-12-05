@@ -99,9 +99,15 @@ classdef ROIController < handle
         end
         
         function DeleteROI(obj, idx, framenumber, slicenumber)
-            for i=1:length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI)
-                delete(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{i});
-                obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{i} = [];
+            for i=1:length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.Position)
+                %Checks wether the field contianing the ROI polygon is
+                %longer than i. If the user has used autotracking, ROIs
+                %have been added and they are only added as arrays (in the
+                %'Position' field. 
+                if(length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI)>=i)
+                    delete(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{i});
+                    obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{i} = [];
+                end
                 obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.Position{i} = [];
             end
         end
