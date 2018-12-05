@@ -146,6 +146,18 @@ classdef ROIController < handle
                 framenumber = framenumber+1;
             end
         end
+        
+        function DrawROIsThrough(obj, slicenumber, framenumber, totalFrames, collectionIdx)
+            for i=framenumber+1:totalFrames
+                for j=1: length(obj.ROICollections{collectionIdx}.ROIs{slicenumber}.Frames{framenumber}.Position)
+                    prevROI = obj.ROICollections{collectionIdx}.ROIs{slicenumber}.Frames{framenumber}.Position{j};
+                    if(~isempty(prevROI))
+                        obj.ROICollections{collectionIdx}.ROIs{slicenumber}.Frames{framenumber+1}.Position{length(obj.ROICollections{collectionIdx}.ROIs{slicenumber}.Frames{framenumber+1}.Position)+1} = prevROI;
+                    end
+                end
+                framenumber = framenumber+1;
+            end
+        end
     end
 end
 
