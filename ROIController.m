@@ -106,11 +106,10 @@ classdef ROIController < handle
             end
         end
         
-%         function DeleteROICollection(obj, idx, framenumber, slicenumber)
-            function DeleteROICollection(obj, idx)
-%             for i=1:length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI)
-%                 delete(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{i});
-%             end
+        function DeleteROICollection(obj, idx, framenumber, slicenumber)
+            for i=1:length(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI)
+                delete(obj.ROICollections{idx}.ROIs{slicenumber}.Frames{framenumber}.ROI{i});
+            end
             
             obj.ROICollections{idx} = [];
             for i=idx+1:length(obj.ROICollections)
