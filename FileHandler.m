@@ -67,7 +67,7 @@ classdef FileHandler
             outputStruct{1} = dicomDisplay;
             outputStruct{2} = RoiController;
             
-            obj.fileAccessor.MATSave(outputStruct,path);
+            obj.fileAccessor.MATSave(path,outputStruct);
         end
         
         function [dicomDisplay, RoiController, dicomFile, numberOfFrames, numberOfSlices] = MATRead(obj, path)
