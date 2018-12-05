@@ -164,6 +164,7 @@ classdef Autotrack
         end
         
         function [vhalvlinje, avinkelhalv, bvinkelhalv] = SC1andSC2(obj, a_1, a_2, x2, y2)
+       
             a_x = abs(atand(a_1));
             b_x = abs(atand(a_2));
             a_x_inner = (180-a_x);
@@ -445,6 +446,7 @@ classdef Autotrack
             end
             
             idxEdges = find(binaryEdgeArray==1);
+<<<<<<< HEAD
              if(length(idxEdges)>0)
                 %distArray = zeros(size(idxEdges));
 %                 for i=1:length(idxEdges)
@@ -474,6 +476,47 @@ classdef Autotrack
                     
 %                 [~,minIdx] = min(distArray);
 %                 edgeIndex = idxEdges(minIdx);
+=======
+            if(length(idxEdges)>1)
+                distArray = zeros(size(idxEdges));
+                for i=1:length(idxEdges)
+                    if(sqrt(((lineSegPixelCoords(idxEdges(1),1)-xComparison)^2)+((lineSegPixelCoords(idxEdges(1),1)-yComparison)^2)))
+                        x = lineSegPixelCoords(idxEdges(i)-3,1);
+                        y = lineSegPixelCoords(idxEdges(i)-3,2);
+                        dist = sqrt(((oldPoint(1)-x)^2)+((oldPoint(2)-y)^2));
+                        distArray(i) = dist;
+                    else
+                        x = lineSegPixelCoords(idxEdges(i)+3,1);
+                        y = lineSegPixelCoords(idxEdges(i)+3,2);
+                        dist = sqrt(((oldPoint(1)-x)^2)+((oldPoint(2)-y)^2));
+                        distArray(i) = dist;
+                    end
+                end
+                [~,minIdx] = min(distArray);
+                edgeIndex = idxEdges(minIdx);
+                
+                xPotential1 = lineSegPixelCoords(3+edgeIndex-3,1);
+                yPotential1 = lineSegPixelCoords(3+edgeIndex-3,2);
+                dist1 = sqrt(((xComparison-xPotential1)^2)+((yComparison-yPotential1)^2));
+                
+                xPotential2 = lineSegPixelCoords(3+edgeIndex+3,1);
+                yPotential2 = lineSegPixelCoords(3+edgeIndex+3,2);
+                dist2 = sqrt(((xComparison-xPotential2)^2)+((yComparison-yPotential2)^2));
+                
+                if(dist1<dist2)
+                    xEdge = xPotential1;
+                    yEdge = yPotential1;
+                else
+                    xEdge = xPotential2;
+                    yEdge = yPotential2;
+                end
+                
+            elseif(length(idxEdges)==1)
+                
+                xPotential1 = lineSegPixelCoords(3+idxEdges-3,1);
+                yPotential1 = lineSegPixelCoords(3+idxEdges-3,2);
+                dist1 = sqrt(((xComparison-xPotential1)^2)+((yComparison-yPotential1)^2));
+>>>>>>> 9d82806ddf4dcff20184bb52e33cdcc38b877b09
                 
 %                 xPotential1 = lineSegPixelCoords(3+edgeIndex-3,1);
 %                 yPotential1 = lineSegPixelCoords(3+edgeIndex-3,2);
