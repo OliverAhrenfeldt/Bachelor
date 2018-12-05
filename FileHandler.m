@@ -33,7 +33,7 @@ classdef FileHandler
             
             % Inputting the absolute values:
             for i=1:length(absValues)
-                currentColumnArray=(zeros((largestNumberOfFrames),1));
+                currentColumnArray=(zeros((totalFrames),1));
                 for j=1:length(absValues{i}.XValues)
                     currentColumnArray(absValues{i}.XValues(j),1)=absValues{i}.CollectionValues(j);
                 end
@@ -42,7 +42,7 @@ classdef FileHandler
             
             % Inputting the relative values:
             for i=1:length(absValues)
-                currentColumnArray=(zeros((largestNumberOfFrames),1));
+                currentColumnArray=(zeros((totalFrames),1));
                 currentRelColumn = relValues{i};
                 for j=1:length(absValues{i}.XValues)
                     currentColumnArray(absValues{i}.XValues(j),1)=currentRelColumn(j);

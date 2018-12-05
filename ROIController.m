@@ -138,7 +138,7 @@ classdef ROIController < handle
                         mask = poly2mask(prevROI(:,1),prevROI(:,2),size(dicomDisplay.dicom_files{1}.DTO{1}.pixelData,1),size(dicomDisplay.dicom_files{1}.DTO{1}.pixelData,2));
                         idx = find(mask>0);
                         prevImage = dicomDisplay.dicom_files{slicenumber}.DTO{framenumber}.pixelData;
-                        threshold = (std2(prevImage(idx)));
+                        threshold = (std2(prevImage(idx)))/2;
                         newROI = obj.Autotracker.TrackImage(image,prevROI,threshold); %OBS threshold skal være relativt baseret på std
                         obj.ROICollections{collectionIdx}.ROIs{slicenumber}.Frames{framenumber+1}.Position{length(obj.ROICollections{collectionIdx}.ROIs{slicenumber}.Frames{framenumber+1}.Position)+1} = newROI;
                     end

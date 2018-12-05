@@ -184,7 +184,7 @@ classdef Autotrack
 
                 % NOTICE: the 'linecirc' function requires 'Mapping
                 % Toolbox'
-                [xinter, yinter] = linecirc(avinkelhalv, bvinkelhalv, x2, y2, 5);
+                [xinter, yinter] = linecirc(avinkelhalv, bvinkelhalv, x2, y2, 2.5);
 %                 drawpoint('Position',[xinter(1),yinter(1)], 'Color', 'r');
 %                 drawpoint('Position',[xinter(2),yinter(2)], 'Color', 'r');
                 [lineSegPixelCoords, lineSegPixelIndex] = obj.lineSeg(xinter, yinter, I1norm);                
@@ -472,21 +472,44 @@ classdef Autotrack
             %arrayet pga. zero padding.
             %https://se.mathworks.com/help/images/imfilter-boundary-padding-options.html
             edgeArray = abs(imfilter(lineSegPixelIndex, filter,'replicate'));
+            
+            
             binaryEdgeArray = zeros(size(edgeArray));
             for i=1:length(edgeArray)
                 if(edgeArray(i)>threshold)
                     binaryEdgeArray(i)=1;
                 end
             end
+
+%             [~,maxIndex] = max(edgeArray);
             
-            idxEdges = find(binaryEdgeArray==1);
+            idxEdges = find(binaryEdgeArray==1);            
             if(length(idxEdges)>0)
+                xmin = 120;
+                index = [];
+                idx = idxEdges +3;
+                edgePixels = lineSegPixelCoords(idx,:);
+                
+                for(i=1: size(edgePixels,1))
+                    if(sqrt(((edgePixels(i,1)-oldPoint(1))^2)+((edgePixels(i,2)-oldPoint(2))^2))<xmin)
+                        xmin = sqrt(((edgePixels(i,1)-oldPoint(1))^2)+((edgePixels(i,2)-oldPoint(2))^2));
+                        index = idx(i);
+                    end
+                end
+%                 
+%            if(~isempty(maxIndex))
+                  
+                
                 if(sqrt(((lineSegPixelCoords(1,1)-xComparison)^2)+((lineSegPixelCoords(1,2)-yComparison)^2))<sqrt(((lineSegPixelCoords(length(lineSegPixelCoords),1)-xComparison)^2)+((lineSegPixelCoords(length(lineSegPixelCoords),2)-yComparison)^2)))
-                    xEdge = lineSegPixelCoords(idxEdges(1),1);
-                    yEdge = lineSegPixelCoords(idxEdges(1),2);
+%                     xEdge = lineSegPixelCoords(idxEdges(1),1);
+%                     yEdge = lineSegPixelCoords(idxEdges(1),2);
+                      xEdge = lineSegPixelCoords(index-3,1);
+                      yEdge = lineSegPixelCoords(index-3,2);
                 else
-                    xEdge = lineSegPixelCoords(idxEdges(length(idxEdges))+6,1);
-                    yEdge = lineSegPixelCoords(idxEdges(length(idxEdges))+6,2);
+%                     xEdge = lineSegPixelCoords(idxEdges(length(idxEdges))+6,1);
+%                     yEdge = lineSegPixelCoords(idxEdges(length(idxEdges))+6,2);
+                      xEdge = lineSegPixelCoords(index+3,1);
+                      yEdge = lineSegPixelCoords(index+3,2);
                 end
             else
                 xEdge = oldPoint(1);
