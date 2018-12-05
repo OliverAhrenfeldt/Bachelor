@@ -79,11 +79,50 @@ classdef Autotrack
                 % skeletonization.
                 hypotenuse = obj.lineSeg([x1,x3], [y1,y3], I1norm);
 
+
+                
+                % Taking horizontal and vertical slopes into account, and
+                % making slight adjustments when they are found. This is
+                % necessary in order to perform the trigonomic calculations
+                % in the scenarios below.
+                if(a_1==0)
+                    a_1 = 0.01;
+                end
+                
+                if(a_2 == 0)
+                    a_2 = 0.01;
+                end
+                
+                if(isinf(a_1) && isinf(a_2))
+                    a_1 = 60;
+                    a_2 = -60;
+                    x2 = x2+0.1;
+                end
+                
+                if(isinf(a_1))
+                    a_1 = 60;
+                    if(x3<x2)
+                        x2 = x2 + 0.1;
+                    else
+                        x2 = x2 - 0.1;
+                    end
+                end
+                
+                if(isinf(a_2))
+                    a_2 = -60;
+                    if(x1<x2)
+                        x2 = x2 + 0.1;
+                    else
+                        x2 = x2 - 0.1;
+                    end
+                end
+                
+                
                 %% Scenarios:
                 % The point of interest can be either to the left, right or
                 % in center of the two adjacent points.
                 left = false; right = false; center = false;
-
+                
                 if (x2-x1<0 && x2-x3<0)
                     left = true;
                 elseif (x2-x1>0 && x2-x3>0)
@@ -132,6 +171,7 @@ classdef Autotrack
                 elseif (a_1>0 && a_2<0 && center)
                     [vhalv, avinkelhalv, bvinkelhalv] = obj.SC12(a_1, a_2, x2, y2);
                 end
+                
 
                 %% Creation of line segment
                 % To find a line segment, a circle is drawn. The cirlce 
