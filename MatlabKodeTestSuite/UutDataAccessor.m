@@ -12,6 +12,8 @@ classdef UutDataAccessor < matlab.unittest.TestCase
                '../TestData/Z5795_Bold'
                '../TestData/Black.dcm'
                '../TestData/White.dcm'
+               '../TestData/ZZBlackSigned.dcm'
+               '../TestData/ZZWhiteSigned.dcm'
                };
            
             for i = 1:length(DicomFilesPath)
@@ -73,8 +75,44 @@ classdef UutDataAccessor < matlab.unittest.TestCase
             expSolution = uint16(65535);
             testCase.verifyEqual(actSolution,expSolution); %Assert
          end 
+         
+         function Dicomread2_4(testCase)
+            [uut paths] = UutDataAccessor.Setup();
+            
+            %Filtrere unødvendige paths for testcasen
+            path = paths(:,4);
+              
+            pixelData = uut.Dicomread(path); %Act
+            
+            actSolution = max(pixelData(:));
+            expSolution = int16(-32768);
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+            
+            actSolution = min(pixelData(:));
+            expSolution = int16(-32768);
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+         end 
+         
+         function Dicomread2_5(testCase)
+            [uut paths] = UutDataAccessor.Setup();
+            
+            %Filtrere unødvendige paths for testcasen
+            path = paths(:,5);
+              
+            pixelData = uut.Dicomread(path); %Act
+            
+            actSolution = max(pixelData(:));
+            expSolution = int16(32767);
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+            
+            actSolution = min(pixelData(:));
+            expSolution = int16(32767);
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+         end 
+         
+         
         
-         function Dicominfo2_4(testCase)
+         function Dicominfo2_6(testCase)
             [uut paths] = UutDataAccessor.Setup();
             
             %Filtrere unødvendige paths for testcasen

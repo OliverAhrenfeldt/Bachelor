@@ -5,11 +5,11 @@ classdef UutROIController < matlab.unittest.TestCase
     
      methods (Static)
        
-       function [ROIControllerObj MockROICollectionObj poly poly2 poly3] = Setup() %Arrange
+       function [ROIControllerObj StubROICollectionObj poly poly2 poly3] = Setup() %Arrange
             addpath ../
            
             ROIControllerObj = ROIController; 
-            MockROICollectionObj = MockROICollection;
+            StubROICollectionObj = StubROICollection;
             
 %               Opretter polygon objekt med forskellige punkter
             points = [500 500;400 600;400 700;500 800;600 800;700 700; 700 600];
@@ -34,9 +34,9 @@ classdef UutROIController < matlab.unittest.TestCase
     methods (Test)
         
         function AddNewCollection6_1(testCase)
-            [uut mockCollection poly]= UutROIController.Setup();   
+            [uut stubCollection poly]= UutROIController.Setup();   
             
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, stubCollection); %Act
             
             actSolution = length(uut.ROICollections);
             expSolution = 1;
@@ -44,9 +44,9 @@ classdef UutROIController < matlab.unittest.TestCase
         end 
         
         function AddNewCollection6_2(testCase)
-            [uut mockCollection poly poly2]= UutROIController.Setup();   
+            [uut stubCollection poly poly2]= UutROIController.Setup();   
             
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly2, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly2, stubCollection); %Act
             
             actSolution = length(uut.ROICollections);
             expSolution = 1;
@@ -54,9 +54,9 @@ classdef UutROIController < matlab.unittest.TestCase
         end 
         
         function AddNewCollection6_3(testCase)
-            [uut mockCollection poly poly2 poly3]= UutROIController.Setup();   
+            [uut stubCollection poly poly2 poly3]= UutROIController.Setup();   
             
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly3, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly3, stubCollection); %Act
             
             actSolution = length(uut.ROICollections);
             expSolution = 1;
@@ -64,9 +64,9 @@ classdef UutROIController < matlab.unittest.TestCase
         end 
         
         function AddROI6_4(testCase)
-            [uut mockCollection poly]= UutROIController.Setup();   
+            [uut stubCollection poly]= UutROIController.Setup();   
             
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, stubCollection); %Act
             uut.AddROI(1, 1, 1, poly)
            
             actSolution = length(uut.ROICollections{1}.ROIs{1}.Frames{1}.ROI);
@@ -75,9 +75,9 @@ classdef UutROIController < matlab.unittest.TestCase
         end 
         
         function AddROI6_5(testCase)
-            [uut mockCollection poly poly2]= UutROIController.Setup();   
+            [uut stubCollection poly poly2]= UutROIController.Setup();   
             
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, stubCollection); %Act
             uut.AddROI(1, 1, 1, poly2)
            
             actSolution = length(uut.ROICollections{1}.ROIs{1}.Frames{1}.ROI);
@@ -86,9 +86,9 @@ classdef UutROIController < matlab.unittest.TestCase
         end 
         
         function AddROI6_6(testCase)
-            [uut mockCollection poly poly2 poly3]= UutROIController.Setup();   
+            [uut stubCollection poly poly2 poly3]= UutROIController.Setup();   
             
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, stubCollection); %Act
             uut.AddROI(1, 1, 1, poly3)
            
             actSolution = length(uut.ROICollections{1}.ROIs{1}.Frames{1}.ROI);
@@ -97,9 +97,9 @@ classdef UutROIController < matlab.unittest.TestCase
         end 
         
         function GetNames6_7(testCase)
-            [uut mockCollection poly]= UutROIController.Setup();   
+            [uut stubCollection poly]= UutROIController.Setup();   
             
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, stubCollection); %Act
             ROICollectionName = uut.getNames();
                
             actSolution = char(ROICollectionName);
@@ -108,9 +108,9 @@ classdef UutROIController < matlab.unittest.TestCase
         end 
         
         function GetAnalysisStatus6_8(testCase)
-            [uut mockCollection poly]= UutROIController.Setup();   
+            [uut stubCollection poly]= UutROIController.Setup();   
             
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, stubCollection); %Act
             ROICollectionStatus = uut.getAnalysisStatus();
                
             actSolution = cell2mat(ROICollectionStatus);
@@ -119,9 +119,9 @@ classdef UutROIController < matlab.unittest.TestCase
         end 
       
          function SetAnalysisStatus6_9(testCase)
-            [uut mockCollection poly]= UutROIController.Setup();   
+            [uut stubCollection poly]= UutROIController.Setup();   
             
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, stubCollection); %Act
             uut.setAnalysisStatus(1,0);
                
             actSolution = uut.ROICollections{1}.AnalysisStatus;
@@ -132,9 +132,9 @@ classdef UutROIController < matlab.unittest.TestCase
         
         
         function GetROITable6_10(testCase)
-            [uut mockCollection poly]= UutROIController.Setup();   
+            [uut stubCollection poly]= UutROIController.Setup();   
             
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, stubCollection); %Act
             [colaName colbStatus] = uut.getROITable();
                
             actSolution = char(colaName);
@@ -147,9 +147,9 @@ classdef UutROIController < matlab.unittest.TestCase
         end 
         
          function GetROITable6_11(testCase)
-            [uut mockCollection poly]= UutROIController.Setup();   
+            [uut stubCollection poly]= UutROIController.Setup();   
             
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, stubCollection); %Act
             uut.setAnalysisStatus(1,0);
             [colaName colbStatus] = uut.getROITable();
                
@@ -177,10 +177,10 @@ classdef UutROIController < matlab.unittest.TestCase
          end 
          
          function DeleteROI6_13(testCase)
-            [uut mockCollection poly] = UutROIController.Setup();   
+            [uut stubCollection poly] = UutROIController.Setup();   
             
             
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, stubCollection); %Act
             uut.AddROI(1, 2, 1, poly);
             uut.DeleteROI(1, 2, 1);
             
@@ -192,9 +192,9 @@ classdef UutROIController < matlab.unittest.TestCase
          end 
          
           function DeleteROICollection6_14(testCase)
-            [uut mockCollection poly] = UutROIController.Setup();   
+            [uut stubCollection poly] = UutROIController.Setup();   
               
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, stubCollection); %Act
             uut.DeleteROICollection(1,1,1);
 
             actSolution = length(uut.ROICollections);
@@ -204,10 +204,10 @@ classdef UutROIController < matlab.unittest.TestCase
          end 
          
          function DeleteROICollection6_15(testCase)
-            [uut mockCollection poly] = UutROIController.Setup();   
+            [uut stubCollection poly] = UutROIController.Setup();   
               
-            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, mockCollection); %Act
-            uut.AddNewCollection('Test2',2,1,'Test2',1,1, poly, mockCollection); %Act
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, stubCollection); %Act
+            uut.AddNewCollection('Test2',2,1,'Test2',1,1, poly, stubCollection); %Act
             uut.DeleteROICollection(1,1,1);
          
 
@@ -217,8 +217,20 @@ classdef UutROIController < matlab.unittest.TestCase
             
          end 
          
+         function DrawROIsThrough6_16(testCase)
+            [uut stubCollection poly] = UutROIController.Setup();
+            
+            uut.AddNewCollection('Test',2,1,'Test',1,1, poly, stubCollection); %Act
+            uut.DrawROIsThrough(1, 1, 2, 1);
+             
+            actSolution = uut.ROICollections{1, 1}.ROIs{1, 1}.Frames{1, 2}.Position{1,2};
+            expSolution = uut.ROICollections{1, 1}.ROIs{1, 1}.Frames{1, 1}.Position{1,1};
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+            
+             
+         end
          
-         
+          
          
     end
 end
