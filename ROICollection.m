@@ -6,8 +6,6 @@ classdef ROICollection < handle
         ROIs;
         Name;
         Color;
-        Autotracking;
-        D3ROI;
         AnalysisStatus;
     end
     
@@ -20,8 +18,6 @@ classdef ROICollection < handle
             obj.ROIs{slicenumber}.Frames{framenumber}.Position{1} = polygon.Position;
             obj.Name = name;
             obj.Color = color;
-            obj.Autotracking = 0;
-            obj.D3ROI = 0;
             obj.AnalysisStatus = 1;
         end
         

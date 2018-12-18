@@ -97,18 +97,16 @@ classdef Autotrack
                     a_1 = 60;
                     a_2 = -60;
                     x2 = x2+0.1;
-                end
                 
-                if(isinf(a_1))
+                elseif(isinf(a_1))
                     a_1 = 60;
                     if(x3<x2)
                         x2 = x2 + 0.1;
                     else
                         x2 = x2 - 0.1;
                     end
-                end
                 
-                if(isinf(a_2))
+                elseif(isinf(a_2))
                     a_2 = -60;
                     if(x1<x2)
                         x2 = x2 + 0.1;
@@ -496,18 +494,11 @@ classdef Autotrack
                         index = idx(i);
                     end
                 end
-%                 
-%            if(~isempty(maxIndex))
-                  
-                
+
                 if(sqrt(((lineSegPixelCoords(1,1)-xComparison)^2)+((lineSegPixelCoords(1,2)-yComparison)^2))<sqrt(((lineSegPixelCoords(length(lineSegPixelCoords),1)-xComparison)^2)+((lineSegPixelCoords(length(lineSegPixelCoords),2)-yComparison)^2)))
-%                     xEdge = lineSegPixelCoords(idxEdges(1),1);
-%                     yEdge = lineSegPixelCoords(idxEdges(1),2);
                       xEdge = lineSegPixelCoords(index-3,1);
                       yEdge = lineSegPixelCoords(index-3,2);
                 else
-%                     xEdge = lineSegPixelCoords(idxEdges(length(idxEdges))+6,1);
-%                     yEdge = lineSegPixelCoords(idxEdges(length(idxEdges))+6,2);
                       xEdge = lineSegPixelCoords(index+3,1);
                       yEdge = lineSegPixelCoords(index+3,2);
                 end
