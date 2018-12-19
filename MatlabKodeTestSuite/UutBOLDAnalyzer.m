@@ -254,7 +254,7 @@ classdef UutBOLDAnalyzer < matlab.unittest.TestCase
             uut.UpdateAnalysis(StubDicomDisplay, StubROIController);
             
             actSolution = uut.absValues{1, 1}.CollectionValues;
-            expSolution = 65535;
+            expSolution = [65535 65535];
             testCase.verifyEqual(actSolution,expSolution); %Assert
         end 
          
