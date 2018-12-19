@@ -1,27 +1,21 @@
 classdef DataAccessor
-    %UNTITLED2 Summary of this class goes here
-    %   Detailed explanation goes here
-    
-    properties
-        Property1
-    end
-    
+    %DataAccessor This class handles the communication with a database in
+    %order to load in DICOM files.
+    %   The class contains two functions that reads DICOM pixeldata and
+    %   metadata respectively. 
+
     methods
-        function obj = untitled2(inputArg1,inputArg2)
-            %UNTITLED2 Construct an instance of this class
-            %   Detailed explanation goes here
-            obj.Property1 = inputArg1 + inputArg2;
-        end
-        
         function outputFrame = Dicomread(obj,path)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %Dicomread This function reads the pixeldata from a DICOM-file
+            %   It is provided with a path, and called in a loop to
+            %   continuously return pixeldata of dicomfiles in a folder
             outputFrame = dicomread(fullfile(path{1}.folder, path{1}.name));
         end
         
         function outputDicomInfo = Dicominfo(obj,path)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %Dicominfo This function reads the metadata from a DICOM-file
+            %   It is provided with a path, and called in a loop to
+            %   continuously return metadata of dicomfiles in a folder
             outputDicomInfo = dicominfo(fullfile(path{1}.folder, path{1}.name));
         end
     end

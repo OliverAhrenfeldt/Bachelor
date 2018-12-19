@@ -1,6 +1,8 @@
 classdef DicomDisplay < handle
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    %DicomDisplay This class handles the communication to the reader class
+    %and holds all the dicom DTO objects
+    %   DicomDisplay has the responsibility of providing the user interface
+    %   with the correct images.
     
     properties
         dicom_files;
@@ -10,32 +12,31 @@ classdef DicomDisplay < handle
     
     methods
         function obj = Constructor(obj)
-            %UNTITLED Construct an instance of this class
-            %   Detailed explanation goes here
+            %Construct an instance of this DicomDisplay
             obj.reader = Reader;
             obj.reader = obj.reader.Constructor();
         end
         
         function dicomFile = ChangeDICOM_file(obj,sliceCounter,frameCounter)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %ChangeDICOM_file This function accesses the DICOM DTO
+            %structure to fetch the correct image
+            %   It returns a Dicom DTO object with the pixeldata and
+            %   metadata. It receives the slice- and frame number.
             dicomFile = obj.dicom_files{sliceCounter}.DTO{frameCounter};
             dicomFile = obj.NormalizeFrame(dicomFile);
             
-            %Konverterer dicomInfo fra et struct til en tabel, så vi kan
-            %vise infoen på GUI'en
+            % Converts the metadata to a table enable it to be displayed in
+            % the user interface
             dicomFile.dicomInfo = obj.CreateTable(dicomFile.dicomInfo);
         end
         
         function [dicomFile, numberOfFrames, numberOfSlices] = ReadDicomFiles(obj, path)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-            
-            
-            %Punktum-mapperne håndteres i Reader-klassen. Vi bør dog finde
-            %en smartere måde til dette. Desuden skal der her være en
-            %validering af filtypen i mappen, men de filer vi har fået
-            %indtil videre har ikke nogen .dcm endelse.
+            %ReadDicomFiles This method reads the DICOM files in the
+            %provided folder path
+            %   It returns a dicom DTO object, containing the first frame
+            %   in the first slice, and the belonging metadata. It returns
+            %   values of the total number of frames and slices. It
+            %   receives a path to a folder containing DICOM files.
             pathsWithDotFolders = dir(fullfile(path));
             Counter = 1;            
             for i=3: length(pathsWithDotFolders) 
@@ -46,27 +47,26 @@ classdef DicomDisplay < handle
             dicomFile = obj.dicom_files{1}.DTO{1};
             dicomFile = obj.NormalizeFrame(dicomFile);
 
-            %Konverterer dicomInfo fra et struct til en tabel, så vi kan
-            %vise infoen på GUI'en
+            % Converts the metadata to a table enable it to be displayed in
+            % the user interface
             dicomFile.dicomInfo = obj.CreateTable(dicomFile.dicomInfo);
-            
-%             object = obj;
             
             numberOfFrames = length(obj.dicom_files{1}.DTO);
             numberOfSlices = length(obj.dicom_files);
         end
         
         function NormalizedDicom = NormalizeFrame(obj,DicomDTOFile)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %NormalizeFrame This function returns a dicom DTO file, in
+            %which the pixeldata is normalized.
+            %   It receives a Dicom DTO object with non-normalized pixeldata.
             DicomDTOFile.pixelData= double(DicomDTOFile.pixelData);
             DicomDTOFile.pixelData = DicomDTOFile.pixelData/max(DicomDTOFile.pixelData(:));
             NormalizedDicom = DicomDTOFile;
         end
         
         function dicomTable = CreateTable(obj,dicomInfo)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %CreateTable This function creates a table from the dicominfo.
+            %   It receives the metadata and returns a table object.
             
             cola = fieldnames(dicomInfo);
             colb = struct2cell(dicomInfo);

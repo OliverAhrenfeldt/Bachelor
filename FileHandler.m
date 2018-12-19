@@ -1,6 +1,8 @@
 classdef FileHandler
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    %FileHandler This class handles the files to load and save.
+    %   It holds a fileAccessor property used to access the database. The
+    %   functions in this class "packages" the data before sending it to
+    %   the fileAccessor, which handles the communication to the database.
     
     properties
         fileAccessor;
@@ -8,14 +10,17 @@ classdef FileHandler
     
     methods
         function obj = Constructor(obj)
-            %UNTITLED Construct an instance of this class
-            %   Detailed explanation goes here
+            %Construct an instance of FileHandler
             obj.fileAccessor = FileAccessor;
         end
         
         function XLSXSave(obj, columnNames, absValues, relValues, totalFrames, path)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %XLSXSave This function packages data into a cell array,
+            %enabling it to be saved as an xlsx file by fileAccessor
+            %   It receives the columnNames (which is the names of the ROI
+            %   collections), the absolute and relative values, the total
+            %   amount of frames in the scan, and a path in which to save
+            %   the file.
             
             % Identifying the amount of rows that need to be in the Excel
             % file.
@@ -61,8 +66,11 @@ classdef FileHandler
         end
         
         function MATSave(obj, dicomDisplay, RoiController, path)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %MATSave This function packages data to be saved as a .Mat file
+            %by fileAccessor
+            %   It receives a dicomDisplay and RoiController object, which
+            %   is all that is needed to restore the application to
+            %   any state. It also receives the path.
             
             outputStruct{1} = dicomDisplay;
             outputStruct{2} = RoiController;

@@ -1,27 +1,21 @@
 classdef ContrastAdjuster
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
-    
-    properties
-        Property1
-    end
-    
+    %ContrastAdjuster This class handles the contrast adjustments made on
+    %an image
+    %   It contains functions for two different types of contrast
+    %   adjustment: Gamma correction and histogram equalization.
     methods
-        function obj = untitled(inputArg1,inputArg2)
-            %UNTITLED Construct an instance of this class
-            %   Detailed explanation goes here
-            obj.Property1 = inputArg1 + inputArg2;
-        end
-        
         function outputFrame = GammaCorrect(obj,gamma,frame)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %GammeCorrect This function performs gamma correction
+            %   The function outputs a gamma corrected image. It is
+            %   provided with a gamma factor and an image.
             outputFrame = frame.^gamma;
         end        
         
         function outputFrame = HistogramEqualize(obj,frame)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %HistogramEqualize This function performs histogram
+            %equalization
+            %   The function outputs a histogram equalized image. It is
+            %   provided with an image to perform the operation on.
             outputFrame = histeq(frame); 
         end
     end
