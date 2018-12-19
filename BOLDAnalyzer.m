@@ -83,7 +83,7 @@ classdef BOLDAnalyzer<handle
                     valExist = find(obj.absValues{CollectionIndex}.XValues == xValue);
                     if(isempty(valExist))
                         obj.absValues{CollectionIndex}.XValues(length(obj.absValues{CollectionIndex}.XValues)+1) = xValue;
-                        obj.absValues{CollectionIndex}.CollectionValues(length(obj.absValues{CollectionIndex}.CollectionValues)+1) = sum(AbsValues);
+                        obj.absValues{CollectionIndex}.CollectionValues(length(obj.absValues{CollectionIndex}.CollectionValues)+1) = length(find(AbsValues>0));
                         [~,idx] = sort(obj.absValues{CollectionIndex}.XValues);
                         obj.absValues{CollectionIndex}.XValues = obj.absValues{CollectionIndex}.XValues(idx);
                         obj.absValues{CollectionIndex}.CollectionValues = obj.absValues{CollectionIndex}.CollectionValues(idx);                
