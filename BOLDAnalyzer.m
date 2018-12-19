@@ -19,39 +19,8 @@ classdef BOLDAnalyzer<handle
             %analysis. It computes the BOLD valus all over.
             %   This function reveives a DicomDisplay and ROIController
             %   object.
-%             ROI = {};
-%             AbsValues = zeros(1,length(DicomDisplay.dicom_files));
-%             for i =1: length(ROIController.ROICollections)
-%                 for j = 1: length(ROIController.ROICollections{i}.ROIs{1}.Frames)
-%                     AbsValues(j)=0;
-%                     for k =1: length(ROIController.ROICollections{i}.ROIs)
-%                         counter = 1;
-%                         for l=1:length(ROIController.ROICollections{i}.ROIs{k}.Frames{j}.Position)
-%                             if(~isempty(ROIController.ROICollections{i}.ROIs{k}.Frames{j}.Position{l}))
-%                                ROI{counter} = ROIController.ROICollections{i}.ROIs{k}.Frames{j}.Position{l};
-%                                counter = counter+1;
-%                             end
-%                         end
-%                         if(~isempty(ROI))
-%                            mask = obj.SetMask(ROI,size(DicomDisplay.dicom_files{1}.DTO{1}.pixelData,1),size(DicomDisplay.dicom_files{1}.DTO{1}.pixelData,2));
-%                            AbsValues(j) = AbsValues(j) + obj.GetAbsoluteValue(mask,DicomDisplay.dicom_files{k}.DTO{j}.pixelData);
-%                            ROI = {};
-%                         end
-%                     end
-%                 end
-%                 Xtotal = (1:length(DicomDisplay.dicom_files{1}.DTO));
-%                 idx = find(AbsValues>0);
-%                 AbsValuesFound = AbsValues(idx);
-%                 XFound = Xtotal(idx);
-%                 obj.absValues{i}.CollectionValues = AbsValuesFound;
-%                 obj.absValues{i}.XValues = XFound;
-%             end
             ROI = {};
-            
-            %AbsCollectionValues= {};
             for i =1: length(ROIController.ROICollections)
-                
-                
                 for j = 1: length(ROIController.ROICollections{i}.ROIs{1}.Frames)
                     AbsValues = zeros(1,length(DicomDisplay.dicom_files));
                     AbsValuesFrame(j)=0;
@@ -80,9 +49,7 @@ classdef BOLDAnalyzer<handle
                 idx = find(AbsValuesFrame>0);
                 AbsValuesFound = AbsValuesFrame(idx);
                 XFound = Xtotal(idx);
-                %AbsCollectionValues{i}.CollectionValues = AbsValuesFound;
                 obj.absValues{i}.CollectionValues = AbsValuesFound;
-                %AbsCollectionValues{i}.XValues = XFound;
                 obj.absValues{i}.XValues = XFound;
             end
         end
