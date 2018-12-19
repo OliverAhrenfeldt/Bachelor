@@ -1,6 +1,14 @@
 classdef Reader < handle
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    %Reader This class handles the loaded DICOM-files
+    %   This class has functionality to sort the loaded dicomfiles. They
+    %   are sorted by frame and slice based on hardcoded dicom-tags. This
+    %   means that not any dicom-files can be sorted, if they do not
+    %   contain the correct DICOM tags. The dicomtags used are: 
+    %   TemporalPositionIdentifier for sorting framewise
+    %   SliceLocation for sorting slicewise.
+    %   The dicom-tag "LOC" is also used to identify localizer images. The
+    %   reason for this is that there might be opportinity to expand the
+    %   application to also show the localizer images some day.
     
     properties
         dataAccessor;
@@ -9,16 +17,18 @@ classdef Reader < handle
     methods
         
         function obj = Constructor(obj)
-            %UNTITLED Construct an instance of this class
-            %   Detailed explanation goes here
+            %Construct an instance of the Reader class
             obj.dataAccessor = DataAccessor;
         end
         
         function [DICOM_files_Sorted, dicomLocalizers] = ReadDicomFiles(obj,paths)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %ReadDicomFiles This function returns the sorted dicomfiles.
+            %   This function returns an array of sorted dicomfiles DTOs,
+            %   and the localizers. It handles the reading and calls
+            %   subfunctions to sort the files.
             
-            %Præallokering for effektivitet
+            %Waitbar reference:
+            %https://se.mathworks.com/matlabcentral/fileexchange/22161-waitbar-with-time-estimation 
             wbar = waitbar(0, 'Reading images');
             for i = 1: length(paths)
                 d = DICOM_File_DTO;
@@ -33,8 +43,12 @@ classdef Reader < handle
         end
         
         function [SortedDicomFiles, localizers] = SortDicomFiles(obj,DICOMFiles)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %SortDicomFiles This function returns the sorted dicomfiles.
+            %   This function returns an array of sorted dicom file DTOs
+            %   and localizers. First it separates the localizer images,
+            %   then it determines which of the dicom-tags "description"
+            %   that are most frequent. Afterwards it calls subfunctions to
+            %   sort the frames and slices.
                 
               locCounter = 1;
               
@@ -94,7 +108,7 @@ classdef Reader < handle
         end
         
         function SortedSlices = SortSlices(obj,SortedDicomFiles)
-            
+            %SortSlices This function returns the sorted slices.
             c = 0;
             sliceLocs(1) = SortedDicomFiles{1}.dicomInfo.SliceLocation;
 
@@ -118,8 +132,6 @@ classdef Reader < handle
                     if(exist('slicesDto','var'))
                         if(isfield(slicesDto{c}, 'DTO'))
                             slicesDto{c}.DTO{length(slicesDto{c}.DTO)+1} = SortedDicomFiles{i};
-%                         else
-%                             slicesDto{c}.DTO{1} = SortedDicomFiles{i};
                         end
                     else
                         slicesDto{1}.DTO{1} = SortedDicomFiles{i};
@@ -134,6 +146,8 @@ classdef Reader < handle
         end
         
         function SortedFrames = SortFrames(obj,FramesToSort)
+            %SortFrames This function returns the sorted frames.
+            
             for i=1: length(FramesToSort)
                 % tempNumbers nulstilles da der i testscenariet ikke
                 % nødvendigvis er samme antal billeder i hvert slice.

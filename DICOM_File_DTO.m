@@ -1,24 +1,12 @@
 classdef DICOM_File_DTO
-    %UNTITLED2 Summary of this class goes here
-    %   Detailed explanation goes here
+    %DICOM_File_DTO This class is a data transfer object
+    %   It is used to combine the pixeldata and metadata of a loaded
+    %   dicom-file. It enables easy access to both, in a single object 
+    %   accross the application.
     
     properties
         pixelData;
         dicomInfo;
-    end
-    
-    methods
-        function obj = untitled2(inputArg1,inputArg2)
-            %UNTITLED2 Construct an instance of this class
-            %   Detailed explanation goes here
-            obj.Property1 = inputArg1 + inputArg2;
-        end
-        
-        function outputArg = method1(obj,inputArg)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-            outputArg = obj.Property1 + inputArg;
-        end
     end
 end
 

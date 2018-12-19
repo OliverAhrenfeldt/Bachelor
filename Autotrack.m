@@ -1,37 +1,32 @@
 classdef Autotrack
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    %Autotrack Holds the autotracking algorithm
+    %   This class is used for tracking an anatomical structure. The class
+    %   can be used by calling the TrackImage function in a loop. For more
+    %   information, see the description for the TrackImage function in
+    %   this class. To understand the approach, please refer to the
+    %   autotracking document provided with this bachelor project.
     
-    properties
-        Property1
-    end
     
     methods
-        function obj = untitled(inputArg1,inputArg2)
-            %UNTITLED Construct an instance of this class
-            %   Detailed explanation goes here
-            obj.Property1 = inputArg1 + inputArg2;
-        end
-        
         function newROI = TrackImage(obj,image,OldROI, threshold)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-            %I1 = dicomread('C:\Users\Mads_\OneDrive - Aarhus universitet\Bachelor\DICOM\BOLD Datasæt\198\CD-rom\A\Z894');
+            %TrackImage This function is used for tracking the movement of
+            %an anatomical structure
+            %   This function returns the positions of the vertices of the
+            %   new ROI. The function receives the following: 
+            %   The raw (not normalized) image with the structure to track.
+            %   The ROI in the previous image that will be used as a basis.
+            %   This ROI should be in the form of a 2-column matrix.
+            %   The threshold, which is the pixel value difference that
+            %   defines when an edge is detected.
+            %   The user should call this method in a loop, to continuously
+            %   provide all images in a single slice.
             
             ROI.Position = OldROI;
-            %Tror vi skal fjerne normaliseringen og finde et threshold
-            %baseret på std i det forrige roi, og så gøre det hele på det
-            %ikke normaliserede billede.
-%             I1norm = double(image)/max(double(image(:)));
-            
-            I1norm = image;
-            
-%             figure(1); imshow(I1norm); ROI= drawpolygon;
             newROI = zeros(size(ROI.Position));
-            %Vi finder centerlinjen gennem ROI'et, for at bestemme hvilken
-            %retning ud fra hvert punkt der er hhv. mod midten af ROIet og
-            %væk fra ROI'et. Løsningen til at finde denne centerlinje er
-            %fundet med inspiration fra Samuels slides fra BDP:
+            
+            % The skeleton of the ROI is determined. This will allow the
+            % algorith to move the ROI slightly towards the center, when an
+            % edge is found.
             mask = poly2mask(ROI.Position(:,1),ROI.Position(:,2),size(image,1),size(image,2));
             skeleton = bwmorph(mask,'skel',Inf);
             centerline = bwmorph(skeleton,'spur',10);
@@ -66,6 +61,7 @@ classdef Autotrack
                 x3 = punkt3(1);
                 y3 = punkt3(2);
 
+                % The terms of the line equations
                 a_1 = (y2 - y1)/(x2-x1);
                 b_1 = y1 - a_1*x1;
 
@@ -77,7 +73,7 @@ classdef Autotrack
                 
                 % Used if no centerline is found in the ROI during
                 % skeletonization.
-                hypotenuse = obj.lineSeg([x1,x3], [y1,y3], I1norm);
+                hypotenuse = obj.lineSeg([x1,x3], [y1,y3], image);
 
 
                 
@@ -176,25 +172,18 @@ classdef Autotrack
                 % center is the point of interest. The intersection between 
                 % the circle and the angle bisector defines the line 
                 % segment.
-
-                %drawcircle('Center', [x2,y2], 'Radius', 5);
-
-
+                
                 % NOTICE: the 'linecirc' function requires 'Mapping
                 % Toolbox'
                 [xinter, yinter] = linecirc(avinkelhalv, bvinkelhalv, x2, y2, 2.5);
-%                 drawpoint('Position',[xinter(1),yinter(1)], 'Color', 'r');
-%                 drawpoint('Position',[xinter(2),yinter(2)], 'Color', 'r');
-                [lineSegPixelCoords, lineSegPixelIndex] = obj.lineSeg(xinter, yinter, I1norm);                
-                %% 
+                [lineSegPixelCoords, lineSegPixelIndex] = obj.lineSeg(xinter, yinter, image);
+                
                 if(isempty(xCenterlineIdx))
-                   [xNew, yNew] = obj.Edgedetection(hypotenuse(:,1), hypotenuse(:,2), lineSegPixelCoords, lineSegPixelIndex,threshold, [x2,y2]);
-%                  drawpoint('Position',[xNew,yNew], 'Color', 'r');                 
+                   [xNew, yNew] = obj.Edgedetection(hypotenuse(:,1), hypotenuse(:,2), lineSegPixelCoords, lineSegPixelIndex,threshold, [x2,y2]);             
                    newROI(i,1)=xNew;
                    newROI(i,2)=yNew;
                 else
-                   [xNew, yNew] = obj.Edgedetection(xCenterlineIdx, yCenterlineIdx, lineSegPixelCoords, lineSegPixelIndex,threshold, [x2,y2]);
-%                  drawpoint('Position',[xNew,yNew], 'Color', 'r');                 
+                   [xNew, yNew] = obj.Edgedetection(xCenterlineIdx, yCenterlineIdx, lineSegPixelCoords, lineSegPixelIndex,threshold, [x2,y2]);           
                    newROI(i,1)=xNew;
                    newROI(i,2)=yNew;
                 end
@@ -202,7 +191,12 @@ classdef Autotrack
         end
         
         function [vhalvlinje, avinkelhalv, bvinkelhalv] = SC1andSC2(obj, a_1, a_2, x2, y2)
-       
+            %SC1andSC2 Two of the scenarios used for trigonomic calculations
+            %   This function returns the slope (avinkelhalv) and y-axis
+            %   intersection (bvinkelhalv) of the angle bisector. It
+            %   receives the slope (a_1 and a_2) of the lines made up of point of
+            %   interest of the two adjacent points. x2 and y2 is the
+            %   coordinates for the point of interest
             a_x = abs(atand(a_1));
             b_x = abs(atand(a_2));
             a_x_inner = (180-a_x);
@@ -225,6 +219,12 @@ classdef Autotrack
         end
         
         function [vhalvlinje, avinkelhalv, bvinkelhalv] = SC3(obj, a_1, a_2, x2, y2)
+            %SC3 One of the scenarios used for trigonomic calculations
+            %   This function returns the slope (avinkelhalv) and y-axis
+            %   intersection (bvinkelhalv) of the angle bisector. It
+            %   receives the slope (a_1 and a_2) of the lines made up of point of
+            %   interest of the two adjacent points. x2 and y2 is the
+            %   coordinates for the point of interest
             a_x = abs(atand(a_1));
             b_x = abs(atand(a_2));
             a_x_inner = (180-a_x);
@@ -250,6 +250,12 @@ classdef Autotrack
         end
         
         function [vhalvlinje, avinkelhalv, bvinkelhalv] = SC4andSC5(obj, a_1, a_2, x2, y2)
+            %SC4andSC5 Two of the scenarios used for trigonomic calculations
+            %   This function returns the slope (avinkelhalv) and y-axis
+            %   intersection (bvinkelhalv) of the angle bisector. It
+            %   receives the slope (a_1 and a_2) of the lines made up of point of
+            %   interest of the two adjacent points. x2 and y2 is the
+            %   coordinates for the point of interest
             a_x = abs(atand(a_1));
             b_x = abs(atand(a_2));
             C = 180-(180-a_x-b_x);
@@ -276,6 +282,12 @@ classdef Autotrack
         end
                 
         function [vhalvlinje, avinkelhalv, bvinkelhalv] = SC6(obj, a_1, a_2, x2, y2)
+            %SC6 One of the scenarios used for trigonomic calculations
+            %   This function returns the slope (avinkelhalv) and y-axis
+            %   intersection (bvinkelhalv) of the angle bisector. It
+            %   receives the slope (a_1 and a_2) of the lines made up of point of
+            %   interest of the two adjacent points. x2 and y2 is the
+            %   coordinates for the point of interest
             a_x = abs(atand(a_1));
             b_x = abs(atand(a_2));
             C = 180-(a_x+b_x);
@@ -302,6 +314,12 @@ classdef Autotrack
         end
         
         function [vhalvlinje, avinkelhalv, bvinkelhalv] = SC7(obj, a_1, a_2, x2, y2)
+            %SC7 One of the scenarios used for trigonomic calculations
+            %   This function returns the slope (avinkelhalv) and y-axis
+            %   intersection (bvinkelhalv) of the angle bisector. It
+            %   receives the slope (a_1 and a_2) of the lines made up of point of
+            %   interest of the two adjacent points. x2 and y2 is the
+            %   coordinates for the point of interest
             a_x = abs(atand(a_1));
             b_x = abs(atand(a_2));
             a_x_inner = (180-a_x);
@@ -323,6 +341,12 @@ classdef Autotrack
         end
         
         function [vhalvlinje, avinkelhalv, bvinkelhalv] = SC8(obj, a_1, a_2, x2, y2)
+            %SC8 One of the scenarios used for trigonomic calculations
+            %   This function returns the slope (avinkelhalv) and y-axis
+            %   intersection (bvinkelhalv) of the angle bisector. It
+            %   receives the slope (a_1 and a_2) of the lines made up of point of
+            %   interest of the two adjacent points. x2 and y2 is the
+            %   coordinates for the point of interest
             a_x = abs(atand(a_1));
             b_x = abs(atand(a_2));
             a_x_inner = (180-a_x);
@@ -344,6 +368,12 @@ classdef Autotrack
         end
         
         function [vhalvlinje, avinkelhalv, bvinkelhalv] = SC9(obj, a_1, a_2, x2, y2)
+            %SC9 One of the scenarios used for trigonomic calculations
+            %   This function returns the slope (avinkelhalv) and y-axis
+            %   intersection (bvinkelhalv) of the angle bisector. It
+            %   receives the slope (a_1 and a_2) of the lines made up of point of
+            %   interest of the two adjacent points. x2 and y2 is the
+            %   coordinates for the point of interest
             a_x = abs(atand(a_1));
             b_x = abs(atand(a_2));
             a_x_inner = (180-a_x);
@@ -369,6 +399,12 @@ classdef Autotrack
         end
         
         function [vhalvlinje, avinkelhalv, bvinkelhalv] = SC10andSC11(obj, a_1, a_2, x2, y2)
+            %SC10andSC11 Two of the scenarios used for trigonomic calculations
+            %   This function returns the slope (avinkelhalv) and y-axis
+            %   intersection (bvinkelhalv) of the angle bisector. It
+            %   receives the slope (a_1 and a_2) of the lines made up of point of
+            %   interest of the two adjacent points. x2 and y2 is the
+            %   coordinates for the point of interest
             b_x = abs(atand(a_1));
             a_x = abs(atand(a_2));
             C = 180-(180-a_x-b_x);
@@ -395,6 +431,12 @@ classdef Autotrack
         end
         
         function [vhalvlinje, avinkelhalv, bvinkelhalv] = SC12(obj, a_1, a_2, x2, y2)
+            %SC12 One of the scenarios used for trigonomic calculations
+            %   This function returns the slope (avinkelhalv) and y-axis
+            %   intersection (bvinkelhalv) of the angle bisector. It
+            %   receives the slope (a_1 and a_2) of the lines made up of point of
+            %   interest of the two adjacent points. x2 and y2 is the
+            %   coordinates for the point of interest
             a_x = abs(atand(a_1));
             b_x = abs(atand(a_2));
             C = 180-(a_x+b_x);
@@ -420,7 +462,16 @@ classdef Autotrack
             vhalvlinje = [punkt1; punkt2];
         end
         
-        function [lineSegPixelCoords, lineSegPixelIndex] = lineSeg(obj, xinter, yinter, I1norm)
+        function [lineSegPixelCoords, lineSegPixelIndex] = lineSeg(obj, xinter, yinter, image)
+            %lineSeg This function is used to find the line segment
+            %   The line segment is used to identify which pixels that
+            %   shall be evaluated when looking for an edge. The function
+            %   returns an array with the coordinates of the line segment,
+            %   which is by default a 2x26 column matrix. As the second
+            %   return value, a matrix with the pixel indices is
+            %   returned. It receives xinter and yinter as 1x2 vectors
+            %   containing the coordinates of the two points that defines
+            %   the line segment. The last parameter is the image.
             x1=xinter(1); y1=yinter(1); x2=xinter(2); y2=yinter(2);
             
             % 20 points destributed evenly along the line segment. These
@@ -439,13 +490,27 @@ classdef Autotrack
             
 
             for i = 1:length(pixels(:,1))
-                lineSegPixelIndex(i) = I1norm(pixels(i,2),pixels(i,1));
+                lineSegPixelIndex(i) = image(pixels(i,2),pixels(i,1));
             end
         end
                 
         function [xEdge, yEdge] = Edgedetection(obj, xCenterlineIdx, yCenterlineIdx, lineSegPixelCoords, longLineSegPixelIndex,threshold, oldPoint)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %Edgedetection Determines when an edge is found. It handles one
+            %ROI vertex at a time.
+            %   This method returns the x and y value of the point, which
+            %   is determined to be an edge, thus the point which the the
+            %   old ROI vertex should be moved to. It receives:
+            %   xCenterlineIdx as the x-coordinates of the ROI skeleton and
+            %   yCenterlineIdx as the y-coordinates of the ROI skelenton.
+            %   lineSegPixelCoords as the coordinates of the line segment
+            %   on which an edge is being searched for.
+            %   longLineSegPixelIndex as the coordinates of an extended
+            %   line segment, to allow for moving the vertex towards the
+            %   center of the ROI, even if an edge is found as one of the
+            %   end-coordinates of the line segment used for finding
+            %   edges. The threshold is the value that determines when an
+            %   edge is an edge. The oldPoint is the vertex that should be
+            %   moved.
             
             lineSegPixelIndex = zeros(1,length(longLineSegPixelIndex)-6);
             counter = 1;
@@ -465,12 +530,11 @@ classdef Autotrack
             yComparison = yCenterlineIdx(minCenterDistanceIdx);
             
             filter = [-1 0 1];
-            %Kilde til replicate. Vi bruger replicate, for at der ikke
-            %identificeres en ikke-eksisterende kant i slutningen af
-            %arrayet pga. zero padding.
+            % source for replicate. Replicate is used to prevent
+            % identification of a non-existing edge at the end of the
+            % array.
             %https://se.mathworks.com/help/images/imfilter-boundary-padding-options.html
             edgeArray = abs(imfilter(lineSegPixelIndex, filter,'replicate'));
-            
             
             binaryEdgeArray = zeros(size(edgeArray));
             for i=1:length(edgeArray)
@@ -478,8 +542,6 @@ classdef Autotrack
                     binaryEdgeArray(i)=1;
                 end
             end
-
-%             [~,maxIndex] = max(edgeArray);
             
             idxEdges = find(binaryEdgeArray==1);            
             if(length(idxEdges)>0)
