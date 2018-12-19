@@ -5,7 +5,7 @@ classdef UutBOLDAnalyzer < matlab.unittest.TestCase
     
      methods (Static)
        
-       function [BoldAnalyzerObj DicomFiles pos1 pos2 pos3 pos4] = Setup() %Arrange
+       function [BoldAnalyzerObj DicomFiles pos1 pos2 pos3 pos4 stubROIController stubDicomDisplay] = Setup() %Arrange
            addpath ../
            
            DicomFilesPath = {
@@ -19,8 +19,6 @@ classdef UutBOLDAnalyzer < matlab.unittest.TestCase
                 d.dicomInfo = dicominfo(DicomFilesPath{i});
                 DicomFiles{i} = d;
             end
-             
-
             
 %             Opretter polygon objekt med forskellige punkter
 %             positions1{1} = {[0 0;1 0;1 1;0 1]};
@@ -32,7 +30,11 @@ classdef UutBOLDAnalyzer < matlab.unittest.TestCase
 %             poly = images.roi.Polygon;
 %             poly.Position = positions1;
             
-            BoldAnalyzerObj = BOLDAnalyzer; 
+            stubROIController = StubROIController; 
+            stubDicomDisplay = StubDicomDisplay;
+
+            BoldAnalyzerObj = BOLDAnalyzer;
+            BoldAnalyzerObj = BoldAnalyzerObj.Constructor();
             
        
        end       
@@ -113,10 +115,150 @@ classdef UutBOLDAnalyzer < matlab.unittest.TestCase
             testCase.verifyEqual(actSolution,expSolution); %Assert
         end 
         
+        function AddValueForFrame7_5(testCase)
+            [uut, ~, ~, ~, ~, positions4, stubROI, stubDicom] = UutBOLDAnalyzer.Setup();
+            
+            sliceNumber = 1;
+            frameNumber = 1;
+            CollectionIndex = 1;
+            
+            StubROIController = stubROI.Constructor(positions4);
+            StubDicomDisplay = stubDicom.Constructor();
+            
+            uut.AddValueForFrame(CollectionIndex, StubDicomDisplay, StubROIController, sliceNumber, frameNumber)
+            
+            actSolution = uut.absValues{1, 1}.CollectionValues;
+            expSolution = 65535;
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+        end 
         
+          
+        function AddValueForFrame7_6(testCase)
+            [uut, ~, ~, ~, positions3, ~, stubROI, stubDicom] = UutBOLDAnalyzer.Setup();
+            
+            sliceNumber = 1;
+            frameNumber = 1;
+            CollectionIndex = 1;
+            
+            StubROIController = stubROI.Constructor(positions3);
+            StubDicomDisplay = stubDicom.Constructor();
+            
+            
+            uut.AddValueForFrame(CollectionIndex, StubDicomDisplay, StubROIController, sliceNumber, frameNumber);
+             
+            actSolution = uut.absValues{1, 1}.CollectionValues;
+            expSolution = [];
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+        end 
+        
+         function GetFrameMeanAndStd7_7(testCase)
+            [uut, ~, ~, ~, positions3, ~, stubROI, stubDicom] = UutBOLDAnalyzer.Setup();
+            
+            sliceNumber = 1;
+            frameNumber = 1;
+            collectionIndex = 1;
+            
+            StubROIController = stubROI.Constructor(positions3);
+            StubDicomDisplay = stubDicom.Constructor();
+            
+            [averageVal, standardDev] = uut.GetFrameMeanAndStd(StubROIController, collectionIndex, frameNumber, sliceNumber, StubDicomDisplay)
+             
+            actSolution = averageVal;
+            expSolution = 0;
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+            
+            actSolution = standardDev;
+            expSolution = 0;
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+            
+         end 
+         
+        function GetFrameMeanAndStd7_8(testCase)
+            [uut, ~, ~, ~, ~, positions4, stubROI, stubDicom] = UutBOLDAnalyzer.Setup();
+            
+            sliceNumber = 1;
+            frameNumber = 1;
+            collectionIndex = 1;
+            
+            StubROIController = stubROI.Constructor(positions4);
+            StubDicomDisplay = stubDicom.Constructor();
+            
+            [averageVal, standardDev] = uut.GetFrameMeanAndStd(StubROIController, collectionIndex, frameNumber, sliceNumber, StubDicomDisplay);
+             
+            actSolution = averageVal;
+            expSolution = 65535;
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+            
+            actSolution = standardDev;
+            expSolution = 0;
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+            
+        end 
+        
+         function GetFrameMeanAndStd7_9(testCase)
+            [uut, ~, ~, positions2, ~, ~, stubROI, stubDicom] = UutBOLDAnalyzer.Setup();
+            
+            sliceNumber = 1;
+            frameNumber = 1;
+            collectionIndex = 1;
+            
+            StubROIController = stubROI.Constructor(positions2);
+            StubDicomDisplay = stubDicom.Constructor();
+            
+            [averageVal, standardDev] = uut.GetFrameMeanAndStd(StubROIController, collectionIndex, frameNumber, sliceNumber, StubDicomDisplay);
+             
+            actSolution = round(averageVal);
+            expSolution = 32768;
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+            
+            actSolution = round(standardDev);
+            expSolution = 32769;
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+         
+         end  
+        
+         function GetFrameMeanAndStd7_10(testCase)
+            [uut, ~, ~, positions2, ~, ~, stubROI, stubDicom] = UutBOLDAnalyzer.Setup();
+            
+            [uut, ~, ~, ~, ~, positions4, stubROI, stubDicom] = UutBOLDAnalyzer.Setup();
+            
+            sliceNumber = 1;
+            frameNumber = 1;
+            CollectionIndex = 1;
+            
+            StubROIController = stubROI.Constructor(positions4);
+            StubDicomDisplay = stubDicom.Constructor();
+            
+            uut.AddValueForFrame(CollectionIndex, StubDicomDisplay, StubROIController, sliceNumber, frameNumber)
+            
+            baselinevalue = 65535;
+            relative = uut.GetRelativeValues(uut.absValues{1, 1}.CollectionValues,baselinevalue)
+            uut.absValues{1, 1}.CollectionValues
+            actSolution = relative;
+            expSolution = 1;
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+            
+         end  
         
          
-        
+          function AddValueForFrame7_11(testCase)
+            [uut, ~, ~, ~, ~, positions4, stubROI, stubDicom] = UutBOLDAnalyzer.Setup();
+            
+            sliceNumber = 1;
+            frameNumber = 1;
+            CollectionIndex = 1;
+            
+            StubROIController = stubROI.Constructor(positions4);
+            StubDicomDisplay = stubDicom.Constructor();
+            
+            uut.UpdateAnalysis(StubDicomDisplay, StubROIController);
+            
+            actSolution = uut.absValues{1, 1}.CollectionValues;
+            expSolution = 65535;
+            testCase.verifyEqual(actSolution,expSolution); %Assert
+        end 
+         
+         
     end
 end
 

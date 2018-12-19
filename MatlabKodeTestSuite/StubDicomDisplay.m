@@ -30,6 +30,9 @@ classdef StubDicomDisplay < handle
                 dicom_files{1}.DTO{i} = d;
            end 
            
+            dicom_files{2} = dicom_files{1};
+            
+           
            obj.dicom_files = dicom_files;
            
              %METHOD1 Summary of this method goes here
