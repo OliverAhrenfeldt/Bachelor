@@ -58,28 +58,28 @@ classdef UutROICollection < matlab.unittest.TestCase
  
         end 
         
-        function Constructor5_4(testCase)
-            [uut polygon] = UutROICollection.Setup();
-             
-            ROICollection = uut.Constructor('Test',2,1,'Test',1,1,polygon); %Act
-            
-            actSolution = ROICollection.Autotracking;
-            expSolution = 0;
-            testCase.verifyEqual(actSolution,expSolution); %Assert
- 
-        end 
+%         function Constructor5_4(testCase)
+%             [uut polygon] = UutROICollection.Setup();
+%              
+%             ROICollection = uut.Constructor('Test',2,1,'Test',1,1,polygon); %Act
+%             
+%             actSolution = ROICollection.Autotracking;
+%             expSolution = 0;
+%             testCase.verifyEqual(actSolution,expSolution); %Assert
+%  
+%         end 
   
         
-        function Constructor5_5(testCase)
-            [uut polygon] = UutROICollection.Setup();
-             
-            ROICollection = uut.Constructor('Test',2,1,'Test',1,1,polygon); %Act
-            
-            actSolution = ROICollection.D3ROI;
-            expSolution = 0;
-            testCase.verifyEqual(actSolution,expSolution); %Assert
- 
-        end
+%         function Constructor5_5(testCase)
+%             [uut polygon] = UutROICollection.Setup();
+%              
+%             ROICollection = uut.Constructor('Test',2,1,'Test',1,1,polygon); %Act
+%             
+%             actSolution = ROICollection.D3ROI;
+%             expSolution = 0;
+%             testCase.verifyEqual(actSolution,expSolution); %Assert
+%  
+%         end
         
         
         function Constructor5_6(testCase)
